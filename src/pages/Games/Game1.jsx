@@ -13,24 +13,24 @@ import {
   ScrollView,
 } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
+import { GameButton } from "../../components/GameTopBar";
 
 /** ICONS */
-import HomeIcon from "../icons/home.svg";
-import NotesIcon from "../icons/notes.svg";
 import Svg, { Line } from "react-native-svg";
-import N_Icon from "../icons/n.svg";
-import N_Letter from "../icons/letterN.svg";
-import I_Icon from "../icons/i.svg";
-import I_Letter from "../icons/letterI.svg";
-import R_Icon from "../icons/r.svg";
-import R_Letter from "../icons/letterR.svg";
-import Z_Icon from "../icons/z.svg";
-import Z_Letter from "../icons/letterZ.svg";
+import N_Icon from "../../icons/n.svg";
+import N_Letter from "../../icons/letterN.svg";
+import I_Icon from "../../icons/i.svg";
+import I_Letter from "../../icons/letterI.svg";
+import R_Icon from "../../icons/r.svg";
+import R_Letter from "../../icons/letterR.svg";
+import Z_Icon from "../../icons/z.svg";
+import Z_Letter from "../../icons/letterZ.svg";
 
 const files1 = [N_Icon, I_Icon, R_Icon, Z_Icon];
 const files2 = [N_Letter, I_Letter, R_Letter, Z_Letter];
 
 import { Pressable } from "react-native";
+import { GameTopBar, NotesScreen } from "./GameLayout";
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 const ww = Math.floor(Dimensions.get("window").width);
@@ -44,8 +44,12 @@ const opt2 = [3, 1, 2, 4];
 let spcBox = fixWW * 0.25;
 let spcBetween = spcBox * 0.25;
 
-const Game1 = () => {
+const Game1 = ({ navigation }) => {
   const [results, setResults] = useState([]);
+  const [openNote, setOpenNote] = useState(false);
+  const toggleNote = () => {
+    setOpenNote(!openNote);
+  };
 
   const scrollRef = useRef(null);
 
@@ -57,10 +61,17 @@ const Game1 = () => {
 
   return (
     <GestureHandlerRootView style={st.rootView}>
-      <ScrollView ref={scrollRef} contentContainerStyle={{ width: "100%" }}>
-        <GameTopBar />
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={{
+          width: "100%",
+          paddingHorizontal: 24,
+          paddingTop: 32,
+        }}
+      >
+        <GameTopBar {...{ openNote, toggleNote }} />
         <Text style={st.title}>
-          Une las señas con las palabras correspondientes
+          Une las señas con las letras correspondientes
         </Text>
         <View style={{ flex: 1 }}>
           <LinesGameScreen
@@ -69,59 +80,10 @@ const Game1 = () => {
             {...{ results, setResults, updateScroll }}
           />
         </View>
-        <Pressable style={st.btn} onPress={confirmResults}>
-          {({ pressed }) => (
-            <Text
-              style={{
-                fontFamily: "Poppins-Regular",
-                color: pressed ? "white" : "#640C66",
-              }}
-            >
-              Confirmar
-            </Text>
-          )}
-        </Pressable>
-
-  
+        <GameButton onPress={confirmResults} />
       </ScrollView>
+      {openNote && <NotesScreen />}
     </GestureHandlerRootView>
-  );
-};
-
-const GameTopBar = () => {
-  return (
-    <View
-      style={{
-        backgroundColor: "white",
-        paddingVertical: 16,
-        width: "100%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-      }}
-    >
-      <HomeIcon width={32} height={32} />
-      <View
-        style={{
-          width: "65%",
-          borderRadius: 12,
-          borderWidth: 2,
-          borderColor: "#640C66",
-          height: 32,
-          paddingHorizontal: 6,
-          justifyContent: "center",
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "#C18DD7",
-            width: "30%",
-            height: 18,
-            borderRadius: 8,
-          }}
-        ></View>
-      </View>
-      <NotesIcon width={32} height={32} />
-    </View>
   );
 };
 
@@ -343,8 +305,8 @@ export default Game1;
 const st = StyleSheet.create({
   rootView: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
+    // paddingHorizontal: 24,
+    // paddingTop: 32,
     backgroundColor: "white",
   },
   title: {
@@ -356,18 +318,6 @@ const st = StyleSheet.create({
     width: "25%",
     height: "100%",
   },
-  btn: ({ pressed }) => [
-    {
-      marginVertical: 24,
-      borderRadius: 12,
-      borderWidth: 2,
-      borderColor: "#640C66",
-      width: "100%",
-      paddingVertical: 12,
-      alignItems: "center",
-      backgroundColor: pressed ? "#640C66" : "white",
-    },
-  ],
 });
 
 /**

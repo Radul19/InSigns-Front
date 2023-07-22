@@ -5,29 +5,37 @@ import {
   Text,
   TextInput,
   Image,
+  Pressable,
 } from "react-native";
 import React from "react";
 import { StyleSheet } from "react-native";
 // import Text from "../components/Text";
 
 import logo from "../images/Logo.png";
-import capy from "../images/capyWelcome.png";
+import heroimage from "../images/login.png";
 
 const ww = Dimensions.get("window").width;
 const wh = Dimensions.get("window").height;
 
-const Login = () => {
+const Login = ({ navigation }) => {
+  const goRegister = () => {
+    navigation.navigate("Register");
+  };
+
+  const goHome = () => {
+    navigation.navigate("Home");
+  };
   return (
-    <ScrollView style={{ width: ww, height: wh, backgroundColor: "#EEC1FB" }}>
+    <ScrollView style={{ backgroundColor: "#EEC1FB" }}>
       <Image
         resizeMode="contain"
-        source={capy}
+        source={heroimage}
         style={{
           position: "absolute",
-          width: 250,
-          height: 250,
-          right: "-10%",
-          top: 90,
+          width: ww * 0.76,
+          height: ww * 0.76,
+          right: "-15%",
+          top: 60,
           zIndex: 50,
         }}
       />
@@ -62,10 +70,10 @@ const Login = () => {
             fontSize: 12,
             fontFamily: "Poppins-Medium",
             color: "#640d65bf",
-            width:'75%'
+            width: "60%",
           }}
         >
-          Preparate con nuestras clases para divertirte mientras aprendes
+          Prepárate con nuestras clases para divertirte mientras aprendes LSV
         </Text>
       </View>
       <View style={st.bottomCtn}>
@@ -92,12 +100,21 @@ const Login = () => {
             Recordar sesion
           </Text>
         </View>
-        <View style={st.button}>
-          <Text style={{ fontFamily: "Poppins-SemiBold",color:'#640D65' }}>Ingresar</Text>
-        </View>
-        <Text style={st.registerText}>
-          No tienes una cuenta? <Text style={st.span}>Registrate Aquí</Text>{" "}
-        </Text>
+        <Pressable style={st.button} onPress={goHome}>
+          <Text style={{ fontFamily: "Poppins-SemiBold", color: "#640D65" }}>
+            Ingresar
+          </Text>
+        </Pressable>
+        <Pressable style={st.registerBtn} onPress={goRegister}>
+          {({ pressed }) => (
+            <>
+              <Text style={st.registerText}>No tienes una cuenta?{"  "}</Text>
+              <Text style={[st.span, { opacity: pressed ? 0.5 : 1 }]}>
+                Registrate
+              </Text>
+            </>
+          )}
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -107,7 +124,7 @@ export default Login;
 
 const st = StyleSheet.create({
   topCtn: {
-    height: wh * 0.4,
+    height: wh * 0.35,
     width: "100%",
     backgroundColor: "#EEC1FB",
     paddingTop: 38,
@@ -115,7 +132,7 @@ const st = StyleSheet.create({
   },
   bottomCtn: {
     zIndex: 200,
-    height: wh * 0.64,
+    minHeight: wh * 0.65 + 38,
     width: "100%",
     borderTopStartRadius: 30,
     borderTopRightRadius: 30,
@@ -129,11 +146,12 @@ const st = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#00000030",
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 8,
     marginBottom: 18,
     alignContent: "center",
     fontFamily: "Poppins-Regular",
+    fontSize: 12,
   },
   checkBox: {
     height: 16,
@@ -142,7 +160,7 @@ const st = StyleSheet.create({
     borderColor: "#000000",
     borderRadius: 4,
   },
-  button: {
+  button: ({ pressed }) => ({
     width: "100%",
     height: 42,
     alignItems: "center",
@@ -151,13 +169,22 @@ const st = StyleSheet.create({
     backgroundColor: "#EEC1FB",
     marginTop: "auto",
     marginBottom: 14,
-  },
+    opacity: pressed ? 0.5 : 1,
+  }),
   registerText: {
     fontFamily: "Poppins-Regular",
     textAlign: "center",
-    marginBottom: 32,
+    // marginBottom: 32,
   },
   span: {
     fontFamily: "Poppins-SemiBold",
+  },
+  registerBtn: {
+    // backgroundColor: "red",
+    display: "flex",
+    flexDirection: "row",
+    marginBottom: 12,
+    justifyContent: "center",
+    paddingVertical: 12,
   },
 });

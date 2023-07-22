@@ -15,50 +15,26 @@ import Svg from "react-native-svg";
 
 import lines from "../images/lines.png";
 import { Pressable } from "react-native";
-
-/** LEVEL FILES */
-const levelFiles = [
-  {
-    image: require("../images/road1.png"),
-    bgc: "#F9DBBB",
-    title: "Nivel 1",
-    subtitle: "Abecedario",
-  },
-  {
-    image: require("../images/road2.png"),
-    bgc: "#F8AAA2",
-    title: "Nivel 2",
-    subtitle: "Abecedario",
-  },
-  {
-    image: require("../images/road3.png"),
-    bgc: "#C3D6B8",
-    title: "Nivel 3",
-    subtitle: "Abecedario",
-  },
-  {
-    image: require("../images/road4.png"),
-    bgc: "#85586F",
-    title: "Nivel 4",
-    subtitle: "Abecedario",
-  },
-];
+import { levelFiles } from "../components/LevelFile";
+import NavBar from "../components/NavBar";
 
 const ww = Dimensions.get("window").width;
 
-const Home2 = () => {
+const Home2 = ({ navigation }) => {
   return (
-    <ScrollView style={st.rootView}>
-      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 32 }}>
-        <Header />
-        <SearchBar />
-        <SubTitles />
-        {/** LEVESL HELL */}
-        <DisplayRoads />
-        {/* <Image source={road1} ></Image> */}
-      </View>
-      <View style={{ height: 48 }}></View>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={st.rootView}>
+        <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 32 }}>
+          <Header />
+          <SearchBar />
+          <SubTitles />
+          {/** LEVESL HELL */}
+          <DisplayRoads {...{ navigation }} />
+        </View>
+        <View style={{ height: 48 }}></View>
+      </ScrollView>
+      <NavBar position={1} />
+    </View>
   );
 };
 
@@ -95,7 +71,13 @@ const Header = () => {
 
 const SubTitles = () => {
   return (
-    <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
+    <View
+      style={{
+        justifyContent: "space-between",
+        flexDirection: "row",
+        marginBottom: 12,
+      }}
+    >
       <Text style={{ fontFamily: "Poppins-Medium", fontSize: 16 }}>Levels</Text>
       <Text
         style={{ fontFamily: "Poppins-Medium", fontSize: 12, color: "#808080" }}
@@ -117,11 +99,19 @@ const SearchBar = () => {
   );
 };
 
-const DisplayRoads = () => {
+const DisplayRoads = ({ navigation }) => {
+  const goLevel = (item) => {
+    navigation.navigate("Levels", item);
+  };
   return (
     <View style={st.cardsCtn}>
       {levelFiles.map((item, index) => (
         <Pressable
+          onPress={() => {
+            if (index < 3) {
+              goLevel(item);
+            }
+          }}
           key={index}
           style={({ pressed }) => [
             {
@@ -136,7 +126,7 @@ const DisplayRoads = () => {
           <Text
             style={{
               fontFamily: "Poppins-Regular",
-              fontSize: 12,
+              fontSize: 11,
               color: "#191919bf",
             }}
           >
@@ -175,8 +165,8 @@ const st = StyleSheet.create({
   card: {
     paddingHorizontal: 12,
     paddingVertical: 12,
-    width: ww * 0.38,
-    height: ww * 0.38 + (ww * 0.38) / 3,
+    width: ww * 0.39,
+    height: ww * 0.39 + (ww * 0.39) / 3,
     borderRadius: 12,
   },
   card_left: { marginBottom: 48 },

@@ -6,35 +6,86 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React, { useState } from "react";
-import { GameTopBar, GameButton } from "../../components/GameTopBar";
-import N_Icon from "../../icons/n.svg";
+import React, { useContext, useEffect, useState } from "react";
 import GameLayout from "./GameLayout";
-
+import { hc } from "../../components/Hands";
+import Context from "../../components/Context";
+import { ResultScreen } from "../../components/GameTopBar";
 /** MultipleSelectionScreen Big Cards */
-const Game2 = () => {
-  const [answer, setAnswer] = useState(0);
+const Game2 = ({ navigation, route }) => {
+  const { lvlData, setLvlData } = useContext(Context);
+  const { levels, stars,pos,loc } = lvlData;
 
-  const confirmResults = () => {};
+
+  const [answer, setAnswer] = useState("");
+  const [rmodal, setRmodal] = useState(0);
+
+
+  const confirmResults = () => {
+    let travel = 0;
+    if (answer === levels[pos].answer[0]) {
+      travel = 1;
+    } else {
+      travel = 2;
+      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+    }
+    if (lvlData.pos + 1 === lvlData.levels.length) {
+      if(lvlData.stars <= 1){
+        travel = 4
+      }else{
+        travel = 3
+      }
+    }
+    setRmodal(travel);
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setRmodal(0);
+      setAnswer("")
+  });
+  
+    return unsubscribe
+  }, [navigation])
 
   return (
-    <GameLayout
-      {...{ confirmResults, title: "¿Cuál es la seña de la letra B?" }}
-    >
-      <MultipleSelectionScreen {...{ answer, setAnswer }} />
-    </GameLayout>
+    <>
+      <ResultScreen status={rmodal} setModal={setRmodal}/>
+      <GameLayout {...{ confirmResults, title: levels[pos].subtitle, pos,loc }}>
+        <MultipleSelectionScreen
+          {...{ answer, setAnswer, lvlData: levels[pos] }}
+        />
+      </GameLayout>
+    </>
   );
 };
 
 export default Game2;
 
-const MultipleSelectionScreen = ({ answer, setAnswer }) => {
+const MultipleSelectionScreen = ({ answer, setAnswer, lvlData }) => {
+  const { options } = lvlData;
   return (
     <View style={st.gameScreen}>
-      <Card c="#F8E4A5" bc="#746357" {...{ answer, setAnswer, value: 1 }} />
-      <Card c="#CEA6CE" bc="#640C66" {...{ answer, setAnswer, value: 2 }} />
-      <Card c="#CEA6CE" bc="#640C66" {...{ answer, setAnswer, value: 3 }} />
-      <Card c="#F8E4A5" bc="#746357" {...{ answer, setAnswer, value: 4 }} />
+      <Card
+        c="#F8E4A5"
+        bc="#746357"
+        {...{ answer, setAnswer, value: options[0] }}
+      />
+      <Card
+        c="#CEA6CE"
+        bc="#640C66"
+        {...{ answer, setAnswer, value: options[1] }}
+      />
+      <Card
+        c="#CEA6CE"
+        bc="#640C66"
+        {...{ answer, setAnswer, value: options[2] }}
+      />
+      <Card
+        c="#F8E4A5"
+        bc="#746357"
+        {...{ answer, setAnswer, value: options[3] }}
+      />
     </View>
   );
 };
@@ -55,7 +106,8 @@ const Card = ({ c, bc, value, setAnswer, answer }) => {
       onPress={press}
     >
       <View style={[st.card, { backgroundColor: c }]}>
-        <N_Icon width={72} height={72} />
+        <View style={{ height: 100, width: 100 }}>{hc[value]}</View>
+        {/* <N_Icon width={72} height={72} /> */}
       </View>
     </Pressable>
   );

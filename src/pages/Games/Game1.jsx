@@ -1,5 +1,5 @@
 import { View, Text, Dimensions } from "react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
@@ -13,7 +13,11 @@ import {
   ScrollView,
 } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
-import { GameButton } from "../../components/GameTopBar";
+import {
+  GameButton,
+  ResultScreen,
+  WinScreen,
+} from "../../components/GameTopBar";
 
 /** ICONS */
 import Svg, { Line } from "react-native-svg";
@@ -30,7 +34,10 @@ const files1 = [N_Icon, I_Icon, R_Icon, Z_Icon];
 const files2 = [N_Letter, I_Letter, R_Letter, Z_Letter];
 
 import { Pressable } from "react-native";
-import { GameTopBar, NotesScreen } from "./GameLayout";
+import { GameTopBar, Note1, Note2, Note3, NotesScreen } from "./GameLayout";
+import { hc } from "../../components/Hands";
+import Context from "../../components/Context";
+import { useNextGame } from "./Game2";
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 const ww = Math.floor(Dimensions.get("window").width);
@@ -38,26 +45,74 @@ const wh = Math.floor(Dimensions.get("window").height);
 const fixWW = ww - 48;
 const fixWH = wh - 48;
 
-const opt1 = [1, 2, 3, 4];
-const opt2 = [3, 1, 2, 4];
-
 let spcBox = fixWW * 0.25;
 let spcBetween = spcBox * 0.25;
 
-const Game1 = ({ navigation }) => {
+const Game1 = ({ navigation, route }) => {
+  const [rmodal, setRmodal] = useState(0);
+
+  const { lvlData, setLvlData } = useContext(Context);
+  const { levels, stars, pos, loc } = lvlData;
   const [results, setResults] = useState([]);
   const [openNote, setOpenNote] = useState(false);
+
+  // const nextGame = useNextGame()
+
   const toggleNote = () => {
     setOpenNote(!openNote);
   };
-
   const scrollRef = useRef(null);
-
-  const confirmResults = () => {};
 
   const updateScroll = (y) => {
     scrollRef.current?.scrollTo({ y, animated: true });
   };
+
+  const confirmResults = () => {
+    const aux = levels[pos].options;
+    const realResults = [
+      aux[results[0]],
+      aux[results[1]],
+      aux[results[2]],
+      aux[results[3]],
+    ];
+    let testb = true;
+
+    levels[pos].answer.forEach((item, index) => {
+      console.log(item);
+      console.log(realResults[index]);
+      if (item !== realResults[index]) {
+        testb = false;
+      }
+    });
+
+    let travel = 0;
+    if (testb) {
+      // if (true) {
+      travel = 1;
+    } else {
+      travel = 2;
+      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+    }
+
+    if (lvlData.pos + 1 === lvlData.levels.length) {
+      if (lvlData.stars <= 1) {
+        travel = 4;
+      } else {
+        travel = 3;
+      }
+    }
+
+    setRmodal(travel);
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      setRmodal(0);
+      setResults([]);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <GestureHandlerRootView style={st.rootView}>
@@ -69,30 +124,33 @@ const Game1 = ({ navigation }) => {
           paddingTop: 32,
         }}
       >
-        <GameTopBar {...{ openNote, toggleNote }} />
-        <Text style={st.title}>
-          Une las señas con las letras correspondientes
-        </Text>
+        <GameTopBar {...{ openNote, toggleNote, length: levels.length, pos }} />
+        <Text style={st.title}>{levels[pos].subtitle}</Text>
         <View style={{ flex: 1 }}>
           <LinesGameScreen
-            options1={opt1}
-            options2={opt2}
-            {...{ results, setResults, updateScroll }}
+            answers={levels[pos].answer}
+            options={levels[pos].options}
+            {...{ results, setResults, updateScroll, loc }}
           />
         </View>
         <GameButton onPress={confirmResults} />
       </ScrollView>
-      {openNote && <NotesScreen />}
+      <ResultScreen status={rmodal} setModal={setRmodal} />
+
+      {loc === 0 && openNote && <Note1 />}
+      {loc === 1 && openNote && <Note2 />}
+      {loc === 2 && openNote && <Note3 />}
     </GestureHandlerRootView>
   );
 };
 
 const LinesGameScreen = ({
-  options1,
-  options2,
+  answers,
+  options,
   updateScroll,
   results,
   setResults,
+  loc,
 }) => {
   // {"height": 468, "width": 312, "x": 0, "y": 0}
   const [layout, setLayout] = useState();
@@ -122,6 +180,7 @@ const LinesGameScreen = ({
       }
     }
     copyResults[start] = end;
+    console.log(copyResults);
     setResults(copyResults);
   };
 
@@ -130,7 +189,7 @@ const LinesGameScreen = ({
       .onStart((e) => {
         if (e.x < (ww - 48) * 0.35) {
           /** DEAM CALC HOLY SHIT */
-          let boxIndex = Math.floor(e.y / (layout?.height / options1.length));
+          let boxIndex = Math.floor(e.y / (layout?.height / answers.length));
           leftStart.value = boxIndex + 1;
           startY.value =
             spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * boxIndex + 1;
@@ -154,8 +213,8 @@ const LinesGameScreen = ({
       .onEnd((e) => {
         if (leftStart.value) {
           if (e.x > (ww - 48) * 0.65) {
-            let boxIndex = Math.floor(e.y / (layout?.height / options1.length));
-            if (boxIndex < options1.length) {
+            let boxIndex = Math.floor(e.y / (layout?.height / answers.length));
+            if (boxIndex < answers.length) {
               runOnJS(updateLine)(leftStart.value - 1, boxIndex);
             }
           }
@@ -196,13 +255,13 @@ const LinesGameScreen = ({
           }}
         >
           <View style={st.gameBoxSide}>
-            {options1.map((item, index) => (
-              <Box key={index} item={item} index={index} />
+            {answers?.map((item, index) => (
+              <Box key={index} value={item} index={index} loc={loc} />
             ))}
           </View>
           <View style={st.gameBoxSide}>
-            {options1.map((item, index) => (
-              <Box key={index} item={item} index={index} right />
+            {options?.map((item, index) => (
+              <Box key={index} value={item} index={index} right loc={loc} />
             ))}
           </View>
         </View>
@@ -211,8 +270,39 @@ const LinesGameScreen = ({
   );
 };
 
-const Box = ({ right = false, index }) => {
-  const MyIcon = right ? files2[index] : files1[index];
+const Box = ({ right = false, index, value, loc }) => {
+  const verifyText = () => {
+    switch (value) {
+      case "q1":
+        return "¿Quién?";
+        break;
+      case "q2":
+        return "¿Cómo?";
+        break;
+      case "q3":
+        return "¿Qué?";
+        break;
+      case "q4":
+        return "¿Cuánto?";
+        break;
+      case "q5":
+        return "¿Dónde?";
+        break;
+      case "q6":
+        return "¿Cuál?";
+        break;
+      case "q7":
+        return "¿Cuándo?";
+        break;
+      case "q8":
+        return "¿Por qué?";
+        break;
+
+      default:
+        // return hc[value];
+        break;
+    }
+  };
   return (
     <View
       style={{
@@ -220,13 +310,35 @@ const Box = ({ right = false, index }) => {
         height: fixWW * 0.25,
         marginVertical: fixWW * 0.25 * 0.25,
         borderRadius: 12,
-        borderWidth: 1,
+        borderWidth: right ? 0 : 1,
         borderColor: "black",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <MyIcon width="48" height="48" />
+      {/* <View style={{ width:48, height: 48,alignItems:'center',justifyContent:'center' }}> */}
+      <View
+        style={{
+          width: loc === 2 && right ? 120 : 48,
+          height: loc === 2 && right ? 64 : 48,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {right ? (
+          <Text
+            style={{
+              fontFamily: "Poppins-Regular",
+              fontSize: loc === 2 ? 24 : 32,
+              textAlign: "center",
+            }}
+          >
+            {loc === 2 ? verifyText() : value}
+          </Text>
+        ) : (
+          hc[value]
+        )}
+      </View>
       {right ? (
         <View
           style={{
@@ -280,23 +392,30 @@ const Box = ({ right = false, index }) => {
   );
 };
 
-const AnswerLine = ({ item = 0, index }) => {
+const AnswerLine = ({ item, index }) => {
+  console.log(item)
   return (
-    <Line
-      x1={fixWW * 0.25 + 17}
-      y1={spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * index + 1}
-      x2={item === -1 ? fixWW * 0.25 + 17 : fixWW * 0.75 - 17}
-      y2={
-        item === -1
-          ? spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * index + 1
-          : spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * item + 1
-      }
-      // x1={100}
-      // y1={100}
-      // x2={150}
-      // y2={150}
-      stroke="black"
-    />
+    <>
+      {item === undefined ? (
+        false
+      ) : (
+        <Line
+          x1={fixWW * 0.25 + 17}
+          y1={spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * index + 1}
+          x2={item === -1 ? fixWW * 0.25 + 17 : fixWW * 0.75 - 17}
+          y2={
+            item === -1
+              ? spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * index + 1
+              : spcBox / 2 + spcBetween + (spcBox + spcBetween * 2) * item + 1
+          }
+          // x1={100}
+          // y1={100}
+          // x2={150}
+          // y2={150}
+          stroke="black"
+        />
+      )}
+    </>
   );
 };
 

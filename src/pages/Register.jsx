@@ -9,31 +9,143 @@ import {
 } from "react-native";
 import heroimg from "../images/register.png";
 import { ww, wh } from "../components/windowsSize";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ArrowDown } from "../components/MyIcons";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
+import moment from "moment/moment";
+import { createUser } from "../components/api";
+import LoadingScreen from "../components/LoadingScreen";
+import Context from "../components/Context";
+
+
+const emptyData = {
+  name: "",
+  second_name: "",
+  genre: 0,
+  birthdate: "",
+  username: "",
+  email: "",
+  password: "",
+  confirmPass: "", 
+}
 
 const Register = ({ navigation }) => {
+
+  const [load, setLoad] = useState(false)
+  const {setUserData} = useContext(Context)
+
   const goLogin = () => {
+    // console.log(inputs);
     navigation.navigate("Login");
   };
+
+  // const [inputs, setInputs] = useState({
+  //   name: "Prueba",
+  //   second_name: "Uno",
+  //   genre: 1,
+  //   birthdate: "13/3/2003",
+  //   username: "usprueba",
+  //   email: "pb@gmail.com",
+  //   password: "123123",
+  //   confirmPass: "123123",
+  // });
+  const [inputs, setInputs] = useState({
+    name: "",
+    second_name: "",
+    genre: 0,
+    birthdate: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPass: "",
+  });
+
+  const handleChange = (name, data) => {
+    setInputs({ ...inputs, [name]: data });
+  };
+
+  const validateData =()=>{
+    let aux = true
+    for (const key in inputs) {
+      if(inputs[key] === emptyData[key]){
+        aux = false
+      }
+    }
+
+    if(inputs.password !== inputs.confirmPass){
+      aux = false
+    }
+
+
+    return aux
+  }
+
+  const registerUser = async ()=>{
+    const confirm = validateData()
+
+    const {confirmPass,...allData} = inputs
+
+    if(confirm){
+      setLoad(true)
+      const {status,data} = await createUser({...allData})
+      setLoad(false)
+      if(status === 200){
+        // console.log(data)
+        navigation.navigate("CodePage",{email:data.email,checkbox:false})
+        // setUserData(data)
+        // navigation.navigate("Home")
+      }
+
+    }else{
+      console.log('error in data')
+    }
+
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <LoadingScreen {...{load}} />
       <View style={st.view}>
         <Header />
         <View style={st.bottom}>
           <Text style={st.subtitle}>Registrarse</Text>
-          <InputLarge placeholder="Nombre" />
-          <InputLarge placeholder="Apellido" />
-          <Dinputs />
-          <InputLarge placeholder="Edad" />
-          <InputLarge placeholder="Nombredeusuario" />
-          <InputLarge placeholder="Correo" />
-          <InputLarge placeholder="Contraseña" />
-          <InputLarge placeholder="Confirmarcontraseña" />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="name"
+            placeholder="Nombre"
+          />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="second_name"
+            placeholder="Apellido"
+          />
+          <Dinputs {...{inputs,handleChange}} />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="username"
+            placeholder="Nombre de usuario"
+          />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="email"
+            placeholder="Correo"
+          />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="password"
+            placeholder="Contraseña"
+            secure={true}
+          />
+          <InputLarge
+            {...{ handleChange, inputs }}
+            name="confirmPass"
+            placeholder="Confirmar Contraseña"
+            secure={true}
+          />
           <View style={{ height: 48 }} />
 
           {/* BOTTOM CONTENT */}
-          <Buttons {...{ goLogin }} />
+          <Buttons {...{ goLogin,registerUser }} />
         </View>
       </View>
     </ScrollView>
@@ -52,10 +164,10 @@ const Header = () => {
   );
 };
 
-const Buttons = ({ goLogin }) => {
+const Buttons = ({ goLogin,registerUser }) => {
   return (
     <>
-      <Pressable style={st.button}>
+      <Pressable style={st.button} onPress={registerUser} >
         <Text style={{ fontFamily: "Poppins-SemiBold", color: "#640D65" }}>
           Registrarse
         </Text>
@@ -74,61 +186,148 @@ const Buttons = ({ goLogin }) => {
   );
 };
 
-const Dinputs = () => {
+const Dinputs = ({inputs,handleChange}) => {
+  const [openDP, setOpenDP] = useState(false);
+  const toggleDP = () => {
+    setOpenDP(!openDP);
+  };
+
+
   const [active, setActive] = useState(false);
   const toggleActive = () => {
     setActive(!active);
   };
+
+
+  const changeDate = (data) => {
+    const newDate = moment(data.nativeEvent.timestamp).format("DD/MM/YYYY");
+    handleChange('birthdate',newDate)
+    // setDate(newDate);
+    setOpenDP(!openDP);
+  };
+
+  const returnGenre =()=>{
+    switch (inputs.genre) {
+      case 0:
+        return 'Genero'
+        break;
+      case 1:
+        return 'Masculino'
+        break;
+      case 2:
+        return 'Femenino'
+        break;
+      case 3:
+        return 'Otros'
+        break;
+    
+      default:
+        break;
+    }
+  }
+
   return (
     <View style={st.dinputs}>
+      {openDP && <RNDateTimePicker value={new Date()} onChange={changeDate} />}
       <View style={{ width: "47%", display: "flex", flexDirection: "row" }}>
         <Pressable
           style={[
             st.input,
             st.inputSelect,
-            { borderColor: active ? "#000" : "#BFBFBF" },
+            {
+              borderColor: active ? "#000" : "#BFBFBF",
+              borderBottomLeftRadius: active ? 0 : 12,
+              borderBottomRightRadius: active ? 0 : 12,
+            },
           ]}
           onPress={toggleActive}
         >
           <Text
             style={{
               fontFamily: "Poppins-Regular",
-              color: "#00000060",
+              color: active || inputs.genre > 0 ? "#000" : "#00000060",
               fontSize: 12,
             }}
           >
-            Genero
+            {returnGenre()}
           </Text>
           <ArrowDown />
         </Pressable>
         {active && (
           <View style={st.absoluteCtn}>
-            <View style={st.firstSpace}></View>
+            {/* <View style={st.firstSpace}></View> */}
             <View style={st.spacesCtn}>
-              <Text style={st.selectItem}>Masculino</Text>
+              <SelectGenre text="Masculino" value={1} {...{handleChange,setActive}} />
               <View style={st.spaces}></View>
-              <Text style={st.selectItem}>Femenino</Text>
+              <SelectGenre text="Femenino" value={2} {...{handleChange,setActive}} />
+              {/* <Text style={st.selectItem}>Femenino</Text> */}
               <View style={st.spaces}></View>
-              <Text style={st.selectItem}>Otros</Text>
+              <SelectGenre text="Otros" value={3} {...{handleChange,setActive}} />
             </View>
           </View>
         )}
       </View>
-      <TextInput
+      <Pressable style={[st.input, st.inputSmall]} onPress={toggleDP}>
+        <Text
+          style={[
+            st.dym,
+            { color: inputs.birthdate === "" ? "#A5A5A5" : "#191919" },
+          ]}
+        >
+          {inputs.birthdate === "" ? "dd/mm/yyyy" : inputs.birthdate }
+        </Text>
+      </Pressable>
+      {/* <TextInput
         style={[st.input, st.inputSmall]}
         placeholder="dd/mm/yyyy"
         value=""
-        // onChangeText={handleChange}
-      />
+        onChangeText={handleChange}
+      /> */}
     </View>
   );
 };
-export const InputLarge = ({ placeholder, value, handleChange,secure=false }) => {
+
+const SelectGenre = ({ text,value,handleChange,setActive }) => {
+  return (
+    <Pressable
+    onPress={()=>{
+      handleChange('genre',value)
+      setActive(false)
+    }}
+      style={({ pressed }) => [
+        st.selectItem,
+        {
+          opacity: pressed ? 0.5 : 1,
+        },
+      ]}
+    >
+      <Text
+        style={{
+          alignItems: "center",
+          fontFamily: "Poppins-Regular",
+          fontSize: 12,
+        }}
+      >
+        {text}
+      </Text>
+    </Pressable>
+  );
+};
+
+export const InputLarge = ({
+  placeholder,
+  inputs,
+  handleChange,
+  secure = false,
+  name,
+}) => {
   return (
     <TextInput
       style={st.input}
-      {...{ placeholder, value }}
-      onChangeText={handleChange}
+      {...{ placeholder, value: inputs[name] }}
+      onChangeText={(text) => {
+        handleChange(name, text);
+      }}
       secureTextEntry={secure}
     />
   );
@@ -203,6 +402,7 @@ const st = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    height: 58,
   },
   inputSelect: {
     width: "100%",
@@ -216,6 +416,7 @@ const st = StyleSheet.create({
   inputSmall: {
     width: "47%",
     textAlign: "center",
+    justifyContent: "center",
   },
   input: {
     width: "100%",
@@ -261,8 +462,8 @@ const st = StyleSheet.create({
     position: "absolute",
     // height:100,
     width: "100%",
-    top: "60%",
-    // backgroundColor:'#fff',
+    top: 46,
+    backgroundColor: "green",
     // borderWidth:2,
     borderTopWidth: 0,
     borderColor: "#000",
@@ -294,7 +495,8 @@ const st = StyleSheet.create({
     width: "100%",
     borderLeftWidth: 2,
     borderRightWidth: 2,
-    borderColor: "#000",
+    // borderColor: "#000",
+    borderColor: "red",
   },
   spacesCtn: {
     display: "flex",
@@ -309,5 +511,10 @@ const st = StyleSheet.create({
     borderLeftWidth: 2,
     borderRightWidth: 2,
     borderColor: "#000",
+  },
+  dym: {
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+    // fontSize: 12,
   },
 });

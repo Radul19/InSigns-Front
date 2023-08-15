@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { ScrollView } from "react-native";
 import LeftArrow from "../icons/left.svg";
 import Dots from "../icons/dots.svg";
@@ -7,17 +7,12 @@ import TrophyDark from "../icons/trophy_dark.svg";
 import Road1 from "../images/road1.png";
 import { LvlCheck, LvlLock, LvlReady, Star } from "../components/MyIcons";
 import { ww, wh } from "../components/windowsSize";
+import Context from "../components/Context";
 // const ww = Dimensions.get("window").width;
 
-const levelsArr = [
-  {
-    num: "01",
-    text: "Welcome to the course",
-  },
-];
-
 const Levels = ({ navigation, route }) => {
-  const { image, bgc, bgcd, title, subtitle, stars, content } = route.params;
+  const {setLvlData,userData} = useContext(Context)
+  const { image, bgc, bgcd, title, subtitle, stars, content,classIndex } = route.params;
 
   return (
     <ScrollView style={{ backgroundColor: "#fff" }}>
@@ -29,20 +24,24 @@ const Levels = ({ navigation, route }) => {
       >
         <Image source={image} style={st.image} resizeMode="contain" />
         <Header {...{ navigation }} />
-        <TopContent {...{ image, title, bgc,bgcd, subtitle, stars }} />
+        <TopContent {...{ image, title, bgc,bgcd,content, subtitle, stars:userData[`class${classIndex}`] }} />
         <View style={st.content}>
           <Text style={{ fontFamily: "Poppins-SemiBold", fontSize: 16 }}>
             Contenido
           </Text>
 
           {content.map((item, index) => {
+            let len = userData[`class${classIndex}`].length
+            let state = 0
+
+            if(len > index) state = 2
+            if(len === index) state = 1
+
             return (
               <LvlCard
               bgcd={bgcd}
                 num={"0" + JSON.stringify(index + 1)}
-                text={item.title}
-                state={item.state}
-                {...{ navigation,index }}
+                {...{ navigation,index,item,setLvlData,userData,state }}
                 key={index}
               />
             );
@@ -96,7 +95,16 @@ const Header = ({ navigation }) => {
   );
 };
 
-const TopContent = ({ image, title, bgc,bgcd, subtitle, stars }) => {
+const TopContent = ({ image, title, bgc,bgcd, subtitle, stars ,content}) => {
+
+
+  const countStars = ()=>{
+    let count = 0
+    stars?.forEach(element => {
+        count += element
+    });
+    return count
+  }
   return (
     <View
       style={{
@@ -128,7 +136,7 @@ const TopContent = ({ image, title, bgc,bgcd, subtitle, stars }) => {
             marginLeft: 12,
           }}
         >
-          {stars}/15
+          {countStars()}/{content.length * 3}
         </Text>
       </View>
     </View>
@@ -154,10 +162,20 @@ const st = StyleSheet.create({
   },
 });
 
-const LvlCard = ({ num = "", text = "", state = 0, navigation,index ,bgcd}) => {
+/** item ===
+ * state
+ * title
+ * levels
+ */
+const LvlCard = ({ num = "",item,navigation,index ,bgcd,setLvlData,userData,state}) => {
+
+  
+
   const goGame = () => {
-    if(state === 1 || state === 2 ){
-      navigation.navigate("Game"+JSON.stringify(index+1));
+    if(state > 0 ){
+      setLvlData({levels:[...item.levels],pos:0,stars:3,loc:item.loc,index:item.index})
+      const gtype = item.levels[0].gameType
+      navigation.navigate("Game"+JSON.stringify(gtype));
     }
   };
   return (
@@ -190,11 +208,11 @@ const LvlCard = ({ num = "", text = "", state = 0, navigation,index ,bgcd}) => {
           // backgroundColor:'red',
           fontFamily: "Poppins-Regular",
           fontSize: 16,
-          opacity: state === 0 ? 0.6 : 1,
+          opacity: item.state === 0 ? 0.6 : 1,
           width: "70%",
         }}
       >
-        {text}
+        {item.title}
       </Text>
       <View style={{ marginLeft: "auto", marginRight: 12, marginTop: -4 }}>
         {state === 2 && <LvlCheck color={bgcd} />}

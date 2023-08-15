@@ -1,45 +1,122 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-import React, { useState } from "react";
-import { GameButton, GameTopBar } from "../../components/GameTopBar";
+import React, { useContext, useEffect, useState } from "react";
+import { GameButton, GameTopBar, ResultScreen } from "../../components/GameTopBar";
 import GameLayout from "./GameLayout";
-import N_Icon from "../../icons/n.svg";
+import { hc } from "../../components/Hands";
+import Context from "../../components/Context";
 
 /** MULTIPLE SELECTION 2 Little Cards */
-const Game4 = () => {
-  const [answer, setAnswer] = useState("0");
-  const confirmResults = () => {};
+const Game4 = ({navigation, route}) => {
+  const { lvlData,setLvlData} = useContext(Context)
+  const {levels,stars,pos,loc} = lvlData
 
-  return (
-    <GameLayout
-      {...{ confirmResults, title: "Escribe la letra correspondiente" }}
-    >
-      <MultipleSelectionScreen2 {...{ answer, setAnswer }} />
+  const [rmodal, setRmodal] = useState(0)
+  const [answer, setAnswer] = useState("");
+  const confirmResults = () => {
+
+    let travel = 0
+
+     if (answer === levels[pos].answer[0]){
+      travel = 1
+      
+    }else{
+      travel = 2
+      setLvlData(prev=>({...prev,stars:prev.stars - 0.5}))
+
+    }
+    if (lvlData.pos + 1 === lvlData.levels.length) {
+      if(lvlData.stars <= 1){
+        travel = 4
+      }else{
+        travel = 3
+      }
+    }
+
+    setRmodal(travel)
+
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setRmodal(0);
+      setAnswer("")
+  });
+  
+    return unsubscribe
+  }, [navigation])
+
+
+  return (<>
+  <ResultScreen status={rmodal} setModal={setRmodal}/>
+    <GameLayout {...{ confirmResults, title: levels[pos].subtitle,pos,loc }}>
+      <MultipleSelectionScreen2
+        {...{ answer, setAnswer, lvlData: levels[pos],loc }}
+      />
     </GameLayout>
+  </>
   );
 };
 
 export default Game4;
 
-const MultipleSelectionScreen2 = ({ answer, setAnswer }) => {
+const MultipleSelectionScreen2 = ({ answer, setAnswer, lvlData,loc }) => {
+  const { options,answer:realAnswer } = lvlData;
   return (
     <View style={st.gameScreen}>
       <View style={st.card}>
-        <N_Icon width={140} height={140} />
+        <View style={{height:140,width:140}} >
+          {hc[realAnswer[0]]}
+        </View>
+        {/* <N_Icon width={140} height={140} /> */}
       </View>
       <View style={st.answer_ctn}>
-        <AnswerCard {...{ value: "A", answer, setAnswer }} />
-        <AnswerCard {...{ value: "B", answer, setAnswer }} />
-        <AnswerCard {...{ value: "C", answer, setAnswer }} />
-        <AnswerCard {...{ value: "D", answer, setAnswer }} />
+        <AnswerCard {...{ value: options[0], answer, setAnswer,loc }} />
+        <AnswerCard {...{ value: options[1], answer, setAnswer,loc }} />
+        <AnswerCard {...{ value: options[2], answer, setAnswer,loc }} />
+        <AnswerCard {...{ value: options[3], answer, setAnswer,loc }} />
       </View>
     </View>
   );
 };
 
-const AnswerCard = ({ value, answer, setAnswer }) => {
+const AnswerCard = ({ value, answer, setAnswer,loc }) => {
   const press = () => {
     setAnswer(value);
   };
+
+  
+  const verifyText=()=>{
+    switch (value) {
+      case 'q1':
+        return '¿Quién?'
+        break;
+      case 'q2':
+        return 'Cómo?'
+        break;
+      case 'q3':
+        return '¿Qué?'
+        break;
+      case 'q4':
+        return 'Cuánto?'
+        break;
+      case 'q5':
+        return '¿Dónde?'
+        break;
+      case 'q6':
+        return 'Cuál?'
+        break;
+      case 'q7':
+        return '¿Cuándo?'
+        break;
+      case 'q8':
+        return '¿Por qué?'
+        break;
+    
+      default:
+        return hc[value]
+        break;
+    }
+  }
 
   return (
     <Pressable
@@ -53,7 +130,7 @@ const AnswerCard = ({ value, answer, setAnswer }) => {
       onPress={press}
     >
       <Text style={[st.text, { color: answer === value ? "#fff" : "#191919" }]}>
-        {value}
+      {loc === 2 ? verifyText() : value}
       </Text>
     </Pressable>
   );

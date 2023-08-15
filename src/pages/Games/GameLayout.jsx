@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   Keyboard,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -13,7 +14,11 @@ import HomeIcon from "../../icons/home.svg";
 import { ww, wh } from "../../components/windowsSize";
 import { Cross } from "../../components/MyIcons";
 
-const GameLayout = ({ confirmResults, title, children }) => {
+import completeHands from "../../images/completes.png";
+import completeNums from "../../images/numCompletes.png";
+import qcomplete from "../../images/qcomplete.png";
+
+const GameLayout = ({ confirmResults, title, children, pos,loc }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [openNote, setOpenNote] = useState(false);
   const toggleNote = () => {
@@ -43,11 +48,15 @@ const GameLayout = ({ confirmResults, title, children }) => {
   return (
     <ScrollView style={st.rootView} contentContainerStyle={{ flexGrow: 1 }}>
       <View style={{ paddingHorizontal: 24, paddingTop: 32, flex: 1 }}>
-        <GameTopBar {...{ openNote, toggleNote }} />
+        <GameTopBar {...{ openNote, toggleNote, pos }} />
         <Text style={st.title}>{title}</Text>
         {children}
       </View>
-      {openNote && <NotesScreen />}
+
+      {((loc === 0) && openNote) && <Note1/>}
+      {((loc === 1) && openNote) && <Note2/>}
+      {((loc === 2) && openNote) && <Note3/>}
+
       <View style={{ paddingHorizontal: 24, marginTop: "auto" }}>
         {!isKeyboardVisible && <GameButton onPress={confirmResults} />}
       </View>
@@ -58,7 +67,7 @@ const GameLayout = ({ confirmResults, title, children }) => {
 
 export default GameLayout;
 
-export const GameTopBar = ({ openNote, toggleNote }) => {
+export const GameTopBar = ({ openNote, toggleNote, length, pos }) => {
   const navigation = useNavigation();
   const goHome = () => {
     navigation.navigate("Home");
@@ -95,7 +104,7 @@ export const GameTopBar = ({ openNote, toggleNote }) => {
         <View
           style={{
             backgroundColor: "#C18DD7",
-            width: "30%",
+            width: ((pos + 1) * 100) / 6 + "%",
             height: 18,
             borderRadius: 8,
           }}
@@ -190,7 +199,7 @@ const st = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#C18DD7",
     paddingHorizontal: 24,
-    paddingTop: 24,
+    // paddingTop: 24,
     bottom: 0,
     height: wh * 0.65,
     width: "100%",
@@ -198,13 +207,17 @@ const st = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
+  top_line_ctn: {
+    backgroundColor: "#C18DD7",
+    paddingVertical:24,
+    // alignContent:'center',
+  },
   top_line: {
     height: 6,
     borderRadius: 12,
     width: 64,
     backgroundColor: "#eee",
     alignSelf: "center",
-    marginBottom: 24,
   },
   note_title: {
     fontFamily: "Poppins-SemiBold",
@@ -214,4 +227,77 @@ const st = StyleSheet.create({
   note_text: {
     fontFamily: "Poppins-Medium",
   },
+  note_img1: {
+    width: ww - 48,
+    height:ww* 1.7,
+    marginVertical:24,
+  },
+  note_img2: {
+    width: ww - 48,
+    height:ww* 1.3,
+    marginVertical:24,
+  },note_img3: {
+    width: ww - 48,
+    height:ww,
+    marginVertical:24,
+  },
 });
+
+export const Note1 = () => {
+  return (
+    <ScrollView style={st.notes_screen} stickyHeaderIndices={[0]}>
+      <View style={st.top_line_ctn}>
+        <View style={st.top_line}></View>
+      </View>
+      <Text style={st.note_title}>Abecedario</Text>
+      <Text style={st.note_text}>
+        Al igual que en el lenguaje hablado, en el lenguaje de señas existe el
+        abecedario y este consta de 27 letras
+      </Text>
+      <Image source={completeHands} style={st.note_img1} resizeMode="contain" />
+    </ScrollView>
+  );
+};
+export const Note2 = () => {
+  return (
+    <ScrollView style={st.notes_screen} stickyHeaderIndices={[0]}>
+      <View style={st.top_line_ctn}>
+        <View style={st.top_line}></View>
+      </View>
+      <Text style={st.note_title}>Números</Text>
+      <Text style={st.note_text}>
+        La forma para contar en lenguaje de señas es muy particular pero
+        sencilla. Solo debes recordar lo siguiente:
+      </Text>
+      <Text style={st.note_text}>
+         - Del 1 al 5 se cuenta primero levantando uno a uno los dedos. Comenzando
+        por el indice hasta el meñique y se finaliza con el pulgar
+      </Text>
+      <Text style={st.note_text}>
+         - Del 6 al 9 se va tocando el dedo pulgar con cada uno de los otros dedos,
+        comenzado del meñique al indice.
+      </Text>
+      <Text style={st.note_text}>
+         - Para el número 10 se cierra el puño y con el puño cerrado primero se
+        muestra el dorso de la mano y se gira para mostrar la “palma” de la mano
+      </Text>
+      <Image source={completeNums} style={st.note_img2} resizeMode="contain" />
+    </ScrollView>
+  );
+};
+export const Note3 = () => {
+  return (
+    <ScrollView style={st.notes_screen} stickyHeaderIndices={[0]}>
+      <View style={st.top_line_ctn}>
+        <View style={st.top_line}></View>
+      </View>
+      <Text style={st.note_title}>Preguntas</Text>
+      <Text style={st.note_text}>
+      Algo muy importante a tomar en cuenta es que al realizar las señas con sus movimientos, se debe hacer de manera calmada y limpia, para que así la otra persona pueda comprender que seña estamos haciendo.
+      </Text>
+      
+      <Image source={qcomplete} style={st.note_img3} resizeMode="contain" />
+     
+    </ScrollView>
+  );
+};

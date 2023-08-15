@@ -8,7 +8,7 @@ import {
   TextInput,
   Keyboard,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import {
   ArrowDown,
@@ -22,16 +22,64 @@ import ava1 from "../images/ava1.png";
 import troph1 from "../images/troph1.png";
 import troph2 from "../images/troph2.png";
 import troph3 from "../images/troph3.png";
+import troph4 from "../images/troph4.png";
 import troph from "../images/troph.png";
 import { avatarList } from "../components/LevelFile";
 import { InputLarge } from "./Register";
+import Context from "../components/Context";
+import { editUser } from "../components/api";
+import LoadingScreen from "../components/LoadingScreen";
+import { ErrorText } from "./Login";
 
 const Profile = () => {
   const [editToggle, setEditToggle] = useState(false);
+  const [errorDisplay, setErrorDisplay] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  const { userData, setUserData } = useContext(Context);
+
+  const [load, setLoad] = useState(false);
+
+  const [name, setName] = useState(userData.username);
+  const [email, setEmail] = useState(userData.email);
+  const [pass, setPass] = useState("");
+  const [passCon, setPassCon] = useState("");
+  const [ava, setAva] = useState(userData.avatar);
+
+  const updateUserData = async () => {
+    if (editToggle === true) {
+      setErrorDisplay(false);
+      if (pass === passCon) {
+        setLoad(true);
+        const { status, data } = await editUser(
+          ava,
+          email,
+          name,
+          pass,
+          userData._id
+        );
+        setLoad(false);
+        if (status === 200) {
+          // console.log(data)
+          setPassCon("");
+          setPass("");
+          setUserData(data);
+          setEditToggle(false);
+        }
+      } else {
+        setErrorDisplay("Las contraseñas no coinciden");
+      }
+    } else {
+      setEditToggle(true);
+    }
+  };
+
   useEffect(() => {
+    // setName(userData.name)
+    // setEmail(userData.email)
+    // setAva(userData.avatar)
+
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -51,23 +99,62 @@ const Profile = () => {
     };
   }, []);
 
+  const updateProps = {
+    name,
+    setName,
+    email,
+    setEmail,
+    pass,
+    setPass,
+    passCon,
+    setPassCon,
+    ava,
+    setAva,
+    errorDisplay,
+  };
+
+  const headerProps = {
+    editToggle,
+    setEditToggle,
+    updateUserData,
+    setErrorDisplay,
+    setPassCon,
+    setPass
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={st.rootView}>
+        <LoadingScreen {...{ load }} />
+
         <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 32 }}>
-          <Header {...{ editToggle, setEditToggle }} />
-          {editToggle ? <UserEditable /> : <UserInfo />}
+          <Header {...headerProps} />
+          {editToggle ? (
+            <UserEditable {...updateProps} />
+          ) : (
+            <UserInfo {...{ userData }} />
+          )}
         </View>
         <View style={{ height: 48 }}></View>
       </ScrollView>
-      {!isKeyboardVisible && <NavBar position={3} />}
+      {!isKeyboardVisible && !load && <NavBar position={3} />}
     </View>
   );
 };
 
-const Header = ({ editToggle, setEditToggle }) => {
+const Header = ({
+  editToggle,
+  setEditToggle,
+  updateUserData,
+  setErrorDisplay,
+  setPassCon,
+  setPass
+}) => {
   const toggleEdit = () => {
+    setErrorDisplay(false);
     setEditToggle(!editToggle);
+    setPassCon("")
+    setPass("")
   };
   return (
     <View style={st.header}>
@@ -76,7 +163,7 @@ const Header = ({ editToggle, setEditToggle }) => {
           <Pressable style={st.leftArrow} onPress={toggleEdit}>
             <LeftArrow />
           </Pressable>
-          <Pressable style={st.gear}>
+          <Pressable style={st.gear} onPress={updateUserData}>
             <Done />
           </Pressable>
         </>
@@ -91,40 +178,87 @@ const Header = ({ editToggle, setEditToggle }) => {
 
 export default Profile;
 
-const UserInfo = () => {
+const countStars = (item) => {
+  let count = 0;
+  item?.forEach((element) => {
+    count += element;
+  });
+  return count;
+};
+
+const percent = (userD) => {
+  let stars0 = countStars(userD.class0);
+  let stars1 = countStars(userD.class1);
+  let stars2 = countStars(userD.class2);
+
+  return Math.round(((stars0 + stars1 + stars2) * 100) / 24);
+};
+
+const UserInfo = ({ userData }) => {
+  useEffect(() => {}, [userData]);
+
   return (
     <>
       <View style={st.uinfo_top}>
-        <Image source={ava1} style={st.uinfo_avatar} />
+        <Image source={avatarList[userData.avatar]} style={st.uinfo_avatar} />
         <View style={st.uinfo_right}>
-          <Text style={st.name}>Alex</Text>
-          <Text style={st.email}>alex305@gmail.com</Text>
+          <Text style={st.name}>{userData.username}</Text>
+          <Text style={st.email}>{userData.email}</Text>
         </View>
       </View>
 
       <View style={st.uinfo_records}>
-        <View style={st.record_box}>
+        {/* <View style={st.record_box}>
           <Text style={st.big_num}>10</Text>
           <Text style={st.little_text}>Dias de racha</Text>
-        </View>
+        </View> */}
         <View style={st.record_box}>
-          <Text style={st.big_num}>%15</Text>
+          <Text style={st.big_num}>%{percent(userData)}</Text>
           <Text style={st.little_text}>Avance</Text>
         </View>
       </View>
 
       <BannerTitle text="Niveles Completados" />
-      <LvlCompleteInfo index={1} lvlTitle="Vocales" completed={5} amount={5} />
-      <LvlCompleteInfo index={2} lvlTitle="Números" completed={3} amount={5} />
+      <LvlCompleteInfo
+        index={1}
+        lvlTitle="Vocales"
+        completed={userData.class0.length}
+        amount={4}
+      />
+      <LvlCompleteInfo
+        index={2}
+        lvlTitle="Números"
+        completed={userData.class1.length}
+        amount={2}
+      />
       <LvlCompleteInfo
         index={3}
         lvlTitle="Preguntas"
-        completed={0}
-        amount={5}
+        completed={userData.class2.length}
+        amount={3}
       />
       <BannerTitle text="Logros" />
-      <ArchItem index={1} lvlTitle="Abecedario" image={troph1} amount={9} />
-      <ArchItem index={2} lvlTitle="Abecedario" image={troph} amount={5} />
+      <ArchItem
+        index={1}
+        lvlTitle="Abecedario"
+        image={troph2}
+        amount={userData.class0}
+        limit={12}
+      />
+      <ArchItem
+        index={2}
+        lvlTitle="Números"
+        image={troph1}
+        amount={userData.class1}
+        limit={6}
+      />
+      <ArchItem
+        index={3}
+        lvlTitle="Preguntas"
+        image={troph3}
+        amount={userData.class2}
+        limit={9}
+      />
     </>
   );
 };
@@ -150,28 +284,34 @@ const LvlCompleteInfo = ({ index, lvlTitle, completed, amount }) => {
   );
 };
 
-const ArchItem = ({ image, index, lvlTitle, amount }) => {
+const ArchItem = ({ image, index, lvlTitle, amount, limit }) => {
   return (
-    <View style={st.archItem_ctn}>
-      <Image source={image} style={st.troph} />
-      <View style={st.archItem_right}>
-        <Text style={st.arch_title}>
-          {index}. {lvlTitle}
-        </Text>
-        <Text style={st.arch_subtitle}>Estrellas conseguidas</Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <StarFill />
-          <Text style={st.arch_subtitle}>{amount}/15</Text>
+    <>
+      {amount.length > 0 && (
+        <View style={st.archItem_ctn}>
+          <Image source={countStars(amount) === limit ? image : troph4} style={st.troph} />
+          <View style={st.archItem_right}>
+            <Text style={st.arch_title}>
+              {index}. {lvlTitle}
+            </Text>
+            <Text style={st.arch_subtitle}>Estrellas conseguidas</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <StarFill color="#FFB431" />
+              <Text style={st.arch_subtitle}>
+                {countStars(amount)}/{limit}
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      )}
+    </>
   );
 };
 
 const st = StyleSheet.create({
   rootView: {
     flex: 1,
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
   },
   header: {
     height: 42,
@@ -284,12 +424,19 @@ const st = StyleSheet.create({
 });
 
 /** EDITABLE CONTENT */
-const UserEditable = () => {
-  const [name, setName] = useState("Alex");
-  const [email, setEmail] = useState("alex305@gmail.com");
-  const [pass, setPass] = useState("");
-  const [passCon, setPassCon] = useState("");
-  const [ava, setAva] = useState(0);
+const UserEditable = ({
+  name,
+  setName,
+  email,
+  setEmail,
+  pass,
+  setPass,
+  passCon,
+  setPassCon,
+  ava,
+  setAva,
+  errorDisplay,
+}) => {
   return (
     <>
       <View style={se.top_ctn}>
@@ -331,6 +478,7 @@ const UserEditable = () => {
           set={setPassCon}
         />
       </View>
+      <ErrorText errorDisplay={errorDisplay} />
     </>
   );
 };
@@ -359,13 +507,19 @@ const InputTitle = ({ ph, title, value, secure, set }) => {
   return (
     <View style={{ marginBottom: 12 }}>
       <Text style={se.inpt_title}>{title}</Text>
-      <InputLarge
+      {/* <InputLarge
         value={value}
         placeholder={ph}
         secure={secure}
         handleChange={set}
+      /> */}
+      <TextInput
+        value={value}
+        placeholder={ph}
+        style={se.inpt_change}
+        onChangeText={set}
+        secureTextEntry={secure}
       />
-      {/* <TextInput value="" placeholder={ph} style={se.inpt_change} /> */}
     </View>
   );
 };
@@ -413,5 +567,17 @@ const se = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     fontSize: 16,
   },
-  inpt_change: {},
+  inpt_change: {
+    width: "100%",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#BFBFBF",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 8,
+    marginBottom: 12,
+    alignContent: "center",
+    fontFamily: "Poppins-Regular",
+    fontSize: 12,
+  },
 });

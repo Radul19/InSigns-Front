@@ -43,23 +43,24 @@ const ContentCtn = () => {
   return (
     <View style={st.content_ctn}>
       <DropdownItem
-        title="Comunicacion Gestual"
-        content="La expresión facial es un elemento de la lengua no manual que se conforma por los movimientos que las personas realizan Lorem ipsum dolor sit amet consectetur. Gravida cursus facilisis congue maecenas gravida placerat gravida. Elit dignissim urna nulla vestibulum ultricies blandit luctus elit varius. Sed mattis etiam diam in in malesuada ornare sed. "
+        title="Comunicación Gestual:"
+        content="La expresión facial es un elemento de la lengua no manual que se conforma por los movimientos que las personas realizan con los labios, posiciones de la lengua, movimientos de los ojos, entre otros, utilizados para enfatizar la información y la fluidez. Esta puede ir acompañada de expresión corporal o movimiento de las manos para expresar emociones o actitudes de manera más intensa."
       />
       <DropdownItem
-        title="Comunicación Corporal"
-        content="La expresión corporal engloba todos los movimientos que una persona puede realizar con el cuerpo y que prende comunicar algo gravida molestie elit dui viverra libero varius. Vitae nunc ut lobortis tincidunt a. Amet non sit arcu egestas. Viverra augue tristique et in tellus est. Suscipit nullam fames id ipsum odio lectus erat. Blandit tincidunt facilisi sed egestas eleifend porta tincidunt ac. "
+        title="Comunicación Corporal:"
+        content="La expresión corporal engloba todos los movimientos que una persona puede realizar con el cuerpo y que pretende comunicar algo. Por ejemplo el mover el cuerpo de acuerdo a la graduación de intensidad, velocidad o tamaño del movimiento al interpretar, permite comunicar cuántas personas hablan, el tipo de personalidad, la emoción detrás del mensaje, y así brindar información a la persona sin tener conocimiento de seña alguna."
       />
       <DropdownItem
         title="¿Qué es el lenguaje de señas?"
-        content="Es el lenguaje oficial de las personas sordas, sin embargo también puede serutilizado por personas que posean algún tipo de discapacidad elit dignissim urna nulla vestibulum ultricies blandit luctus elit varius. Sed mattis etiam diam in in malesuada ornare sed. 
-        "
+        content="Es el lenguaje oficial de las personas sordas, sin embargo también puede ser utilizado por personas que posean algún tipo de discapacidad para poder comunicarse con palabras. Como sustituto del lenguaje oral, este también cumple las funciones necesarias para permitir la comunicación con libertad, logrando elaborar ideas y enriquecer el pensamiento de la persona que lo emplea."
       />
       <DropdownItem
         title="Estructura de LSV"
-        content="Lorem ipsum dolor sit amet consectetur. Gravida cursus facilisis congue maecenas gravida placerat gravida. Elit dignissim urna nulla vestibulum ultricies blandit luctus elit varius. Sed mattis etiam diam in in malesuada ornare sed. 
-
-        Gravida molestie elit dui viverra libero varius. Vitae nunc ut lobortis tincidunt a. Amet non sit arcu egestas. Viverra augue tristique et in tellus est. Suscipit nullam fames id ipsum odio lectus erat. Blandit tincidunt facilisi sed egestas eleifend porta tincidunt ac."
+        content="El lenguaje de señas es expresivo en su totalidad, y no sólo muestra propiedades organizativas complejas, también cuenta con una estructura gramatical independiente de la expresión oral. A continuación se muestra la estructura del LSV: Objeto + Sujeto + Verbo. 
+        También tiene un orden al momento de expresar las ideas:
+        1.Cronología (Tiempo)
+        2.Circunstancia (Situación o mensaje principal)
+        3.Causa-Efecto (Resultado)"
       />
     </View>
   );

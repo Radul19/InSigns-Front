@@ -34,8 +34,15 @@ const files1 = [N_Icon, I_Icon, R_Icon, Z_Icon];
 const files2 = [N_Letter, I_Letter, R_Letter, Z_Letter];
 
 import { Pressable } from "react-native";
-import { GameTopBar, Note1, Note2, Note3, NotesScreen } from "./GameLayout";
-import { hc } from "../../components/Hands";
+import {
+  GameTopBar,
+  Note1,
+  Note2,
+  Note3,
+  Note4,
+  NotesScreen,
+} from "./GameLayout";
+import { fm, hc } from "../../components/Hands";
 import Context from "../../components/Context";
 import { useNextGame } from "./Game2";
 const AnimatedLine = Animated.createAnimatedComponent(Line);
@@ -49,8 +56,9 @@ let spcBox = fixWW * 0.25;
 let spcBetween = spcBox * 0.25;
 
 const Game1 = ({ navigation, route }) => {
-  const [rmodal, setRmodal] = useState(0);
+  const [sChance, setSChance] = useState(true)
 
+  const [rmodal, setRmodal] = useState(0);
   const { lvlData, setLvlData } = useContext(Context);
   const { levels, stars, pos, loc } = lvlData;
   const [results, setResults] = useState([]);
@@ -78,8 +86,6 @@ const Game1 = ({ navigation, route }) => {
     let testb = true;
 
     levels[pos].answer.forEach((item, index) => {
-      console.log(item);
-      console.log(realResults[index]);
       if (item !== realResults[index]) {
         testb = false;
       }
@@ -90,12 +96,18 @@ const Game1 = ({ navigation, route }) => {
       // if (true) {
       travel = 1;
     } else {
-      travel = 2;
-      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      if(sChance){
+        setSChance(false)
+        travel = 5
+      }else{
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
     }
 
     if (lvlData.pos + 1 === lvlData.levels.length) {
       if (lvlData.stars <= 1) {
+
         travel = 4;
       } else {
         travel = 3;
@@ -107,6 +119,7 @@ const Game1 = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      setSChance(true)
       setRmodal(0);
       setResults([]);
     });
@@ -135,11 +148,12 @@ const Game1 = ({ navigation, route }) => {
         </View>
         <GameButton onPress={confirmResults} />
       </ScrollView>
-      <ResultScreen status={rmodal} setModal={setRmodal} />
+      <ResultScreen status={rmodal} setModal={setRmodal} {...{sChance,setSChance}} />
 
       {loc === 0 && openNote && <Note1 />}
       {loc === 1 && openNote && <Note2 />}
       {loc === 2 && openNote && <Note3 />}
+      {loc === 3 && openNote && <Note4 />}
     </GestureHandlerRootView>
   );
 };
@@ -180,7 +194,6 @@ const LinesGameScreen = ({
       }
     }
     copyResults[start] = end;
-    console.log(copyResults);
     setResults(copyResults);
   };
 
@@ -297,6 +310,18 @@ const Box = ({ right = false, index, value, loc }) => {
       case "q8":
         return "¿Por qué?";
         break;
+      case "fatherS":
+        return "Papá";
+        break;
+      case "olderS":
+        return "Abuelo";
+        break;
+      case "sonS":
+        return "Hijo";
+        break;
+      case "hermS":
+        return "Hermano";
+        break;
 
       default:
         // return hc[value];
@@ -319,8 +344,8 @@ const Box = ({ right = false, index, value, loc }) => {
       {/* <View style={{ width:48, height: 48,alignItems:'center',justifyContent:'center' }}> */}
       <View
         style={{
-          width: loc === 2 && right ? 120 : 48,
-          height: loc === 2 && right ? 64 : 48,
+          width: loc === 3 || (loc === 2 && right) ? 120 : 48,
+          height: loc === 3 || (loc === 2 && right) ? 64 : 48,
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -329,14 +354,14 @@ const Box = ({ right = false, index, value, loc }) => {
           <Text
             style={{
               fontFamily: "Poppins-Regular",
-              fontSize: loc === 2 ? 24 : 32,
+              fontSize: loc === 2 || loc === 3 ? 18 : 32,
               textAlign: "center",
             }}
           >
-            {loc === 2 ? verifyText() : value}
+            {loc === 2 || loc === 3 ? verifyText() : value}
           </Text>
         ) : (
-          hc[value]
+          <>{loc === 3 ? fm[value] : hc[value]}</>
         )}
       </View>
       {right ? (
@@ -393,7 +418,6 @@ const Box = ({ right = false, index, value, loc }) => {
 };
 
 const AnswerLine = ({ item, index }) => {
-  console.log(item)
   return (
     <>
       {item === undefined ? (

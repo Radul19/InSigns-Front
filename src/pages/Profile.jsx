@@ -23,6 +23,7 @@ import troph1 from "../images/troph1.png";
 import troph2 from "../images/troph2.png";
 import troph3 from "../images/troph3.png";
 import troph4 from "../images/troph4.png";
+import troph5 from "../images/troph5.png";
 import troph from "../images/troph.png";
 import { avatarList } from "../components/LevelFile";
 import { InputLarge } from "./Register";
@@ -119,7 +120,7 @@ const Profile = () => {
     updateUserData,
     setErrorDisplay,
     setPassCon,
-    setPass
+    setPass,
   };
 
   return (
@@ -148,13 +149,13 @@ const Header = ({
   updateUserData,
   setErrorDisplay,
   setPassCon,
-  setPass
+  setPass,
 }) => {
   const toggleEdit = () => {
     setErrorDisplay(false);
     setEditToggle(!editToggle);
-    setPassCon("")
-    setPass("")
+    setPassCon("");
+    setPass("");
   };
   return (
     <View style={st.header}>
@@ -190,8 +191,15 @@ const percent = (userD) => {
   let stars0 = countStars(userD.class0);
   let stars1 = countStars(userD.class1);
   let stars2 = countStars(userD.class2);
+  let stars3 = countStars(userD.class3);
+  const totalStars = stars0 + stars1 + stars2 + stars3;
+  const totalLength =
+    userD.class0.length +
+    userD.class1.length +
+    userD.class2.length +
+    userD.class3.length;
 
-  return Math.round(((stars0 + stars1 + stars2) * 100) / 24);
+  return Math.round((totalStars * 100) / totalLength/3);
 };
 
 const UserInfo = ({ userData }) => {
@@ -221,7 +229,7 @@ const UserInfo = ({ userData }) => {
       <BannerTitle text="Niveles Completados" />
       <LvlCompleteInfo
         index={1}
-        lvlTitle="Vocales"
+        lvlTitle="Abecedario"
         completed={userData.class0.length}
         amount={4}
       />
@@ -235,6 +243,12 @@ const UserInfo = ({ userData }) => {
         index={3}
         lvlTitle="Preguntas"
         completed={userData.class2.length}
+        amount={3}
+      />
+      <LvlCompleteInfo
+        index={4}
+        lvlTitle="Familia"
+        completed={userData.class3.length}
         amount={3}
       />
       <BannerTitle text="Logros" />
@@ -255,8 +269,15 @@ const UserInfo = ({ userData }) => {
       <ArchItem
         index={3}
         lvlTitle="Preguntas"
-        image={troph3}
+        image={troph5}
         amount={userData.class2}
+        limit={9}
+      />
+      <ArchItem
+        index={4}
+        lvlTitle="Familia"
+        image={troph3}
+        amount={userData.class3}
         limit={9}
       />
     </>
@@ -289,7 +310,10 @@ const ArchItem = ({ image, index, lvlTitle, amount, limit }) => {
     <>
       {amount.length > 0 && (
         <View style={st.archItem_ctn}>
-          <Image source={countStars(amount) === limit ? image : troph4} style={st.troph} />
+          <Image
+            source={countStars(amount) === limit ? image : troph4}
+            style={st.troph}
+          />
           <View style={st.archItem_right}>
             <Text style={st.arch_title}>
               {index}. {lvlTitle}

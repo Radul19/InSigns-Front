@@ -7,7 +7,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import heroimg from "../images/register.png";
+import heroimg from "../images/Logo.png";
 import { ww, wh } from "../components/windowsSize";
 import { useContext, useState } from "react";
 import { ArrowDown } from "../components/MyIcons";
@@ -155,7 +155,7 @@ const Register = ({ navigation }) => {
 const Header = () => {
   return (
     <View style={st.top}>
-      <Image source={heroimg} style={st.heroimg} />
+      <Image source={heroimg} style={st.heroimg} resizeMode="contain" />
       <Text style={st.title}>
         Descubre una nueva alternativa de comunicación!
       </Text>
@@ -168,7 +168,7 @@ const Buttons = ({ goLogin,registerUser }) => {
   return (
     <>
       <Pressable style={st.button} onPress={registerUser} >
-        <Text style={{ fontFamily: "Poppins-SemiBold", color: "#640D65" }}>
+        <Text style={{ fontFamily: "Poppins-SemiBold", color: "#FFF" }}>
           Registrarse
         </Text>
       </Pressable>
@@ -199,11 +199,11 @@ const Dinputs = ({inputs,handleChange}) => {
   };
 
 
-  const changeDate = (data) => {
-    const newDate = moment(data.nativeEvent.timestamp).format("DD/MM/YYYY");
-    handleChange('birthdate',newDate)
+  const changeDate = (text) => {
+    // const newDate = moment(data.nativeEvent.timestamp).format("DD/MM/YYYY");
+    handleChange('birthdate',text)
     // setDate(newDate);
-    setOpenDP(!openDP);
+    // setOpenDP(!openDP);
   };
 
   const returnGenre =()=>{
@@ -267,7 +267,7 @@ const Dinputs = ({inputs,handleChange}) => {
           </View>
         )}
       </View>
-      <Pressable style={[st.input, st.inputSmall]} onPress={toggleDP}>
+      {/* <Pressable style={[st.input, st.inputSmall]} onPress={toggleDP}>
         <Text
           style={[
             st.dym,
@@ -276,13 +276,13 @@ const Dinputs = ({inputs,handleChange}) => {
         >
           {inputs.birthdate === "" ? "dd/mm/yyyy" : inputs.birthdate }
         </Text>
-      </Pressable>
-      {/* <TextInput
+      </Pressable> */}
+      <TextInput
         style={[st.input, st.inputSmall]}
         placeholder="dd/mm/yyyy"
-        value=""
-        onChangeText={handleChange}
-      /> */}
+        value={inputs.birthdate}
+        onChangeText={changeDate}
+      />
     </View>
   );
 };
@@ -349,19 +349,19 @@ const st = StyleSheet.create({
   },
   top: {
     height: wh * 0.35,
-    backgroundColor: "#EEC1FB",
+    backgroundColor: "#8A36D2",
     // justifyContent:'center',
     paddingHorizontal: 20,
     paddingTop: 48,
   },
   heroimg: {
     position: "absolute",
-    height: ww * 0.5 * 0.9,
-    width: ww * 0.9,
+    height: ww * 0.33,
+    width: ww * 0.33,
     zIndex: 200,
     // top: "11%",
-    bottom: 0,
-    left: "-18%",
+    bottom: 42,
+    left: 24,
   },
   box: {
     width: ww,
@@ -376,7 +376,7 @@ const st = StyleSheet.create({
     width: "90%",
     alignSelf: "flex-end",
     textAlign: "right",
-    color: "#640D65",
+    color: "#FFF",
     fontSize: 26,
     fontFamily: "Poppins-Medium",
     lineHeight: 38,
@@ -388,6 +388,7 @@ const st = StyleSheet.create({
     // height: wh * 0.7,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
+    marginTop:-12
   },
   subtitle: {
     fontSize: 16,
@@ -437,7 +438,7 @@ const st = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 14,
-    backgroundColor: "#EEC1FB",
+    backgroundColor: "#8A36D2",
     marginTop: "auto",
     marginBottom: 14,
     opacity: pressed ? 0.5 : 1,

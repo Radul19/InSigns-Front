@@ -32,6 +32,7 @@ const emptyUser = {
   class0: [],
   class1: [],
   class2: [],
+  class3: [],
 };
 
 const getStars = (userData) => {
@@ -59,7 +60,8 @@ const Home2 = ({ navigation }) => {
       <ScrollView style={st.rootView}>
         <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 32 }}>
           <Header {...{ navigation, setUserData, userData }} />
-          <SearchBar />
+          {/* <SearchBar /> */}
+          <View style={{height:24}} ></View>
           <SubTitles {...{ userData }} />
           {/** LEVESL HELL */}
           <DisplayRoads {...{ navigation, setUserData, userData }} />
@@ -123,8 +125,9 @@ const SubTitles = ({ userData }) => {
     let aux0 = userData.class0.length
     let aux1 = userData.class1.length
     let aux2 = userData.class2.length
+    let aux3 = userData.class3.length
 
-    return aux0+aux1+aux2
+    return aux0+aux1+aux2+aux3
   };
 
   return (
@@ -141,7 +144,7 @@ const SubTitles = ({ userData }) => {
       <Text
         style={{ fontFamily: "Poppins-Medium", fontSize: 12, color: "#808080" }}
       >
-        {totalClasses()}/14 clases
+        {totalClasses()}/12 clases
       </Text>
     </View>
   );

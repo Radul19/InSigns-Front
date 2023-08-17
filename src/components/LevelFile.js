@@ -9,7 +9,6 @@
 eas build --profile production --platform android
  */
 
-import { fm } from "./Hands"
 
 export const levelFiles = [
   {
@@ -248,6 +247,7 @@ export const levelFiles = [
   {
     image: require("../images/road3.png"),
     req: 14,
+    // req:0,
     bgc: "#C6B4ED",
     bgcd: '#584583',
     title: "Preguntas",
@@ -361,7 +361,7 @@ export const levelFiles = [
   },
   {
     image: require("../images/road4.png"),
-    req: 0,
+    req: 18,
     bgc: "#FF9A2F",
     bgcd: '#873000',
     title: "Familia",
@@ -436,14 +436,51 @@ export const levelFiles = [
         options: ["broI","hermS","manS"],
         gameType: 6,
       }]
-    }]
+    },
+    {
+      loc: 3,
+      index: 2,
+      title: 'Familia Práctica',
+      levels: [{
+        subtitle: 'Escribe el significado de la seña presentada ',
+        answer: ['HIJA'],
+        options: ["daugI","sonS","womanS",],
+        gameType: 6,
+      },{
+        subtitle: 'Escribe la palabra correspondiente',
+        answer: ['motherS'],
+        options: [],
+        gameType: 3,
+      },{
+        subtitle: 'Une las señas con su significado correspondiente',
+        answer: ['sonS',"fatherS","hermS","olderS"],
+        options: ["fatherS","olderS","sonS","hermS"],
+        gameType: 1,
+      },{
+        subtitle: '¿Cuál es la seña de la palabra “Mujer”?',
+        answer: ['womanS'],
+        options: ["olderS","hermS","womanS","fatherS"],
+        gameType: 2,
+      },{
+        subtitle: 'Selecciona la respuesta correcta',
+        answer: ['famS'],
+        options: ["sisS","famS","fatherS","daugS"],
+        gameType: 4,
+      },{
+        subtitle: 'Escribe la palabra correspondiente',
+        answer: ['manS'],
+        options: ["HOMBRE"],
+        gameType: 3,
+      }]
+    }
+  ]
   },{
     image: require("../images/road5.png"),
     req: 100,
-    bgc: "#FF9A2F",
-    bgcd: '#873000',
-    title: "Familia",
-    subtitle: "Grupo Familiar",
+    bgc: "#83E473",
+    bgcd: '#0E6500',
+    title: "Verbos",
+    subtitle: "Más comunes",
     content:[{
       loc: 3,
       index: 0,

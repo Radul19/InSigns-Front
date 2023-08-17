@@ -2,11 +2,12 @@ import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { GameButton, GameTopBar, ResultScreen } from "../../components/GameTopBar";
 import GameLayout from "./GameLayout";
-import { hc } from "../../components/Hands";
+import { fm, hc } from "../../components/Hands";
 import Context from "../../components/Context";
 
 /** MULTIPLE SELECTION 2 Little Cards */
 const Game4 = ({navigation, route}) => {
+  const [sChance, setSChance] = useState(true)
   const { lvlData,setLvlData} = useContext(Context)
   const {levels,stars,pos,loc} = lvlData
 
@@ -20,8 +21,13 @@ const Game4 = ({navigation, route}) => {
       travel = 1
       
     }else{
-      travel = 2
-      setLvlData(prev=>({...prev,stars:prev.stars - 0.5}))
+      if(sChance){
+        setSChance(false)
+        travel = 5
+      }else{
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
 
     }
     if (lvlData.pos + 1 === lvlData.levels.length) {
@@ -38,6 +44,7 @@ const Game4 = ({navigation, route}) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      setSChance(true)
       setRmodal(0);
       setAnswer("")
   });
@@ -65,7 +72,7 @@ const MultipleSelectionScreen2 = ({ answer, setAnswer, lvlData,loc }) => {
     <View style={st.gameScreen}>
       <View style={st.card}>
         <View style={{height:140,width:140}} >
-          {hc[realAnswer[0]]}
+          {loc === 3 ? fm[realAnswer[0]] :hc[realAnswer[0]]}
         </View>
         {/* <N_Icon width={140} height={140} /> */}
       </View>
@@ -91,25 +98,37 @@ const AnswerCard = ({ value, answer, setAnswer,loc }) => {
         return '¿Quién?'
         break;
       case 'q2':
-        return 'Cómo?'
+        return '¿Cómo?'
         break;
       case 'q3':
         return '¿Qué?'
         break;
       case 'q4':
-        return 'Cuánto?'
+        return '¿Cuánto?'
         break;
       case 'q5':
         return '¿Dónde?'
         break;
       case 'q6':
-        return 'Cuál?'
+        return '¿Cuál?'
         break;
       case 'q7':
         return '¿Cuándo?'
         break;
       case 'q8':
         return '¿Por qué?'
+        break;
+      case 'sisS':
+        return 'Hermana'
+        break;
+      case 'famS':
+        return 'Familia'
+        break;
+      case 'fatherS':
+        return 'Papá'
+        break;
+      case 'daugS':
+        return 'Hija'
         break;
     
       default:
@@ -130,7 +149,7 @@ const AnswerCard = ({ value, answer, setAnswer,loc }) => {
       onPress={press}
     >
       <Text style={[st.text, { color: answer === value ? "#fff" : "#191919" }]}>
-      {loc === 2 ? verifyText() : value}
+      {loc === 2 || loc === 3 ? verifyText() : value}
       </Text>
     </Pressable>
   );

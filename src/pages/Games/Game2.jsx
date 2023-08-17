@@ -8,11 +8,12 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import GameLayout from "./GameLayout";
-import { hc } from "../../components/Hands";
+import { fm, hc } from "../../components/Hands";
 import Context from "../../components/Context";
 import { ResultScreen } from "../../components/GameTopBar";
 /** MultipleSelectionScreen Big Cards */
 const Game2 = ({ navigation, route }) => {
+  const [sChance, setSChance] = useState(true)
   const { lvlData, setLvlData } = useContext(Context);
   const { levels, stars,pos,loc } = lvlData;
 
@@ -26,8 +27,13 @@ const Game2 = ({ navigation, route }) => {
     if (answer === levels[pos].answer[0]) {
       travel = 1;
     } else {
-      travel = 2;
-      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      if(sChance){
+        setSChance(false)
+        travel = 5
+      }else{
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
     }
     if (lvlData.pos + 1 === lvlData.levels.length) {
       if(lvlData.stars <= 1){
@@ -41,6 +47,7 @@ const Game2 = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      setSChance(true)
       setRmodal(0);
       setAnswer("")
   });
@@ -53,7 +60,7 @@ const Game2 = ({ navigation, route }) => {
       <ResultScreen status={rmodal} setModal={setRmodal}/>
       <GameLayout {...{ confirmResults, title: levels[pos].subtitle, pos,loc }}>
         <MultipleSelectionScreen
-          {...{ answer, setAnswer, lvlData: levels[pos] }}
+          {...{ answer, setAnswer, lvlData: levels[pos],loc }}
         />
       </GameLayout>
     </>
@@ -62,35 +69,35 @@ const Game2 = ({ navigation, route }) => {
 
 export default Game2;
 
-const MultipleSelectionScreen = ({ answer, setAnswer, lvlData }) => {
+const MultipleSelectionScreen = ({ answer, setAnswer, lvlData,loc }) => {
   const { options } = lvlData;
   return (
     <View style={st.gameScreen}>
       <Card
-        c="#F8E4A5"
+        c="#FEC454"
         bc="#746357"
-        {...{ answer, setAnswer, value: options[0] }}
+        {...{ answer, setAnswer, value: options[0],loc }}
       />
       <Card
-        c="#CEA6CE"
+        c="#AD72DF"
         bc="#640C66"
-        {...{ answer, setAnswer, value: options[1] }}
+        {...{ answer, setAnswer, value: options[1],loc }}
       />
       <Card
-        c="#CEA6CE"
+        c="#AD72DF"
         bc="#640C66"
-        {...{ answer, setAnswer, value: options[2] }}
+        {...{ answer, setAnswer, value: options[2],loc }}
       />
       <Card
-        c="#F8E4A5"
+        c="#FEC454"
         bc="#746357"
-        {...{ answer, setAnswer, value: options[3] }}
+        {...{ answer, setAnswer, value: options[3],loc }}
       />
     </View>
   );
 };
 
-const Card = ({ c, bc, value, setAnswer, answer }) => {
+const Card = ({ c, bc, value, setAnswer, answer,loc }) => {
   const press = () => {
     setAnswer(value);
   };
@@ -106,7 +113,7 @@ const Card = ({ c, bc, value, setAnswer, answer }) => {
       onPress={press}
     >
       <View style={[st.card, { backgroundColor: c }]}>
-        <View style={{ height: 100, width: 100 }}>{hc[value]}</View>
+        <View style={{ height: 100, width: 100 }}>{loc === 3 ?fm[value] :hc[value]}</View>
         {/* <N_Icon width={72} height={72} /> */}
       </View>
     </Pressable>

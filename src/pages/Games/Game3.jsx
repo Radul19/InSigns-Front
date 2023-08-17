@@ -7,11 +7,11 @@ import {
 } from "../../components/GameTopBar";
 import GameLayout from "./GameLayout";
 import N_Icon from "../../icons/n.svg";
-import { hc } from "../../components/Hands";
+import { fm, hc } from "../../components/Hands";
 import Context from "../../components/Context";
 
-const writeReverse = (aux)=>{
-  let text = aux.toUpperCase()
+const writeReverse = (aux) => {
+  let text = aux.toUpperCase();
   switch (text) {
     case "¿QUIÉN?":
       return "q1";
@@ -37,36 +37,49 @@ const writeReverse = (aux)=>{
     case "¿POR QUÉ?":
       return "q8";
       break;
+    case "MAMÁ":
+      return "motherS";
+      break;
+    case "HOMBRE":
+      return "manS";
+      break;
 
     default:
       // return hc[value];
       break;
   }
-}
+};
 
 /** WriteAnswer */
 const Game3 = ({ navigation, route }) => {
+  const [sChance, setSChance] = useState(true)
   const { lvlData, setLvlData } = useContext(Context);
-  const { levels, stars, pos,loc } = lvlData;
+  const { levels, stars, pos, loc } = lvlData;
   const [rmodal, setRmodal] = useState(0);
 
   const [answer, setAnswer] = useState("");
   const confirmResults = () => {
     let travel = 0;
-    let realAnswer = loc === 2 ? writeReverse(answer) : answer
-    if ( realAnswer === levels[pos].answer[0]) {
-      travel = 1
+
+    const noSpace = answer.replace(/\s/g, "");
+    let realAnswer = loc === 2 || loc === 3 ? writeReverse(noSpace) : noSpace;
+    if (realAnswer === levels[pos].answer[0]) {
+      travel = 1;
     } else {
-      
-      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
-      travel = 2
+      if(sChance){
+        setSChance(false)
+        travel = 5
+      }else{
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
     }
 
     if (lvlData.pos + 1 === lvlData.levels.length) {
-      if(lvlData.stars <= 1){
-        travel = 4
-      }else{
-        travel = 3
+      if (lvlData.stars <= 1) {
+        travel = 4;
+      } else {
+        travel = 3;
       }
     }
 
@@ -74,19 +87,24 @@ const Game3 = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      setSChance(true)
       setRmodal(0);
-      setAnswer("")
-  });
-  
-    return unsubscribe
-  }, [navigation])
+      setAnswer("");
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <>
-      <ResultScreen status={rmodal} setModal={setRmodal}/>
-      <GameLayout {...{ confirmResults, title: levels[pos].subtitle, pos,loc }}>
-        <WriteAnswerScreen {...{ answer, setAnswer, lvlData: levels[pos] }} />
+      <ResultScreen status={rmodal} setModal={setRmodal} />
+      <GameLayout
+        {...{ confirmResults, title: levels[pos].subtitle, pos, loc }}
+      >
+        <WriteAnswerScreen
+          {...{ answer, setAnswer, lvlData: levels[pos], loc }}
+        />
       </GameLayout>
     </>
   );
@@ -94,12 +112,13 @@ const Game3 = ({ navigation, route }) => {
 
 export default Game3;
 
-const WriteAnswerScreen = ({ answer, setAnswer, lvlData }) => {
-  
+const WriteAnswerScreen = ({ answer, setAnswer, lvlData, loc }) => {
   return (
     <View style={st.gameScreen}>
       <View style={st.card}>
-        <View style={{ height: 170, width: 170 }}>{hc[lvlData.answer[0]]}</View>
+        <View style={{ height: 170, width: 170 }}>
+          {loc === 3 ? fm[lvlData.answer[0]] : hc[lvlData.answer[0]]}
+        </View>
       </View>
       <TextInput
         value={answer}
@@ -131,7 +150,7 @@ const st = StyleSheet.create({
     width: 210,
     height: 270,
     borderRadius: 18,
-    backgroundColor: "#CEA6CE",
+    backgroundColor: "#AD72DF",
     alignItems: "center",
     justifyContent: "center",
   },

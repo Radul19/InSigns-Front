@@ -18,7 +18,21 @@ import completeHands from "../../images/completes.png";
 import completeNums from "../../images/numCompletes.png";
 import qcomplete from "../../images/qcomplete.png";
 
-const GameLayout = ({ confirmResults, title, children, pos,loc }) => {
+import q1 from "../../images/HandsQuestions/q1.png";
+import q2 from "../../images/HandsQuestions/q2.png";
+import q3 from "../../images/HandsQuestions/q3.png";
+import q4 from "../../images/HandsQuestions/q4.png";
+import q5 from "../../images/HandsQuestions/q5.png";
+import q6 from "../../images/HandsQuestions/q6.png";
+import q7 from "../../images/HandsQuestions/q7.png";
+import q8 from "../../images/HandsQuestions/q8.png";
+import { fm } from "../../components/Hands";
+
+import plus from "../../images/plus.png";
+import equal from "../../images/equal.png";
+import { fn } from "moment/moment";
+
+const GameLayout = ({ confirmResults, title, children, pos, loc }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [openNote, setOpenNote] = useState(false);
   const toggleNote = () => {
@@ -53,9 +67,10 @@ const GameLayout = ({ confirmResults, title, children, pos,loc }) => {
         {children}
       </View>
 
-      {((loc === 0) && openNote) && <Note1/>}
-      {((loc === 1) && openNote) && <Note2/>}
-      {((loc === 2) && openNote) && <Note3/>}
+      {loc === 0 && openNote && <Note1 />}
+      {loc === 1 && openNote && <Note2 />}
+      {loc === 2 && openNote && <Note3 />}
+      {loc === 3 && openNote && <Note4 />}
 
       <View style={{ paddingHorizontal: 24, marginTop: "auto" }}>
         {!isKeyboardVisible && <GameButton onPress={confirmResults} />}
@@ -209,7 +224,7 @@ const st = StyleSheet.create({
   },
   top_line_ctn: {
     backgroundColor: "#C18DD7",
-    paddingVertical:24,
+    paddingVertical: 24,
     // alignContent:'center',
   },
   top_line: {
@@ -229,17 +244,25 @@ const st = StyleSheet.create({
   },
   note_img1: {
     width: ww - 48,
-    height:ww* 1.7,
-    marginVertical:24,
+    height: ww * 1.7,
+    marginVertical: 24,
   },
   note_img2: {
     width: ww - 48,
-    height:ww* 1.3,
-    marginVertical:24,
-  },note_img3: {
+    height: ww * 1.3,
+    marginVertical: 24,
+  },
+  note_img3: {
     width: ww - 48,
-    height:ww,
-    marginVertical:24,
+    height: ww,
+    marginVertical: 24,
+  },
+  note_img4: {
+    width: (ww - 24) * 0.25,
+    height: ww * 0.3,
+    backgroundColor: "#9B50D3",
+    borderRadius: 12,
+    padding: 6,
   },
 });
 
@@ -270,15 +293,15 @@ export const Note2 = () => {
         sencilla. Solo debes recordar lo siguiente:
       </Text>
       <Text style={st.note_text}>
-         - Del 1 al 5 se cuenta primero levantando uno a uno los dedos. Comenzando
-        por el indice hasta el meñique y se finaliza con el pulgar
+        - Del 1 al 5 se cuenta primero levantando uno a uno los dedos.
+        Comenzando por el indice hasta el meñique y se finaliza con el pulgar
       </Text>
       <Text style={st.note_text}>
-         - Del 6 al 9 se va tocando el dedo pulgar con cada uno de los otros dedos,
-        comenzado del meñique al indice.
+        - Del 6 al 9 se va tocando el dedo pulgar con cada uno de los otros
+        dedos, comenzado del meñique al indice.
       </Text>
       <Text style={st.note_text}>
-         - Para el número 10 se cierra el puño y con el puño cerrado primero se
+        - Para el número 10 se cierra el puño y con el puño cerrado primero se
         muestra el dorso de la mano y se gira para mostrar la “palma” de la mano
       </Text>
       <Image source={completeNums} style={st.note_img2} resizeMode="contain" />
@@ -293,11 +316,118 @@ export const Note3 = () => {
       </View>
       <Text style={st.note_title}>Preguntas</Text>
       <Text style={st.note_text}>
-      Algo muy importante a tomar en cuenta es que al realizar las señas con sus movimientos, se debe hacer de manera calmada y limpia, para que así la otra persona pueda comprender que seña estamos haciendo.
+        Algo muy importante a tomar en cuenta es que al realizar las señas con
+        sus movimientos, se debe hacer de manera calmada y limpia, para que así
+        la otra persona pueda comprender que seña estamos haciendo.
       </Text>
-      
-      <Image source={qcomplete} style={st.note_img3} resizeMode="contain" />
-     
+      <NoteText3
+        title="¿Quién?"
+        text="Con el puño cerrado tocamos la barbilla con el dedo pulgar y llevamos la mano hacia el frente."
+        img={q1}
+      />
+      <NoteText3
+        title="¿Cómo?"
+        text="Unimos nuestros dedos y rotamos de dentro hacia afuera."
+        img={q2}
+      />
+      <NoteText3
+        title="¿Qué?"
+        text="Primero la palma de la mano esta hacia abajo y con un movimiento sutil de la mano volteamos para mostrar la palma."
+        img={q3}
+      />
+      <NoteText3
+        title="¿Cuánto?"
+        text="Se hace la simulación de estar contando con los dedos. Es decir, el dedo pulgar toca cada uno de los dedos comenzando por el meñique."
+        img={q4}
+      />
+      <NoteText3
+        title="¿Dónde?"
+        text="Con la mano abierta hacia abajo y los dedos juntos se hace la forma de un circulo."
+        img={q5}
+      />
+      <NoteText3
+        title="¿Cuál?"
+        text="Con ambas manos abiertas y las palmas hacia abajo se hace el movimiento de voltear ambas manos para mostrar las palmas. Esta seña representa dos opciones a escoger, es por ello que se utiliza para preguntar ¿Cuál?."
+        img={q6}
+      />
+      <NoteText3
+        title="¿Cuándo?"
+        text="Con la mano abierta y los dedos relajados se dibuja en el aire un círculo hacía adelante."
+        img={q7}
+      />
+      <NoteText3
+        title="¿Por Qué?"
+        text="La mano derecha da un toque al dorso de la mano izquierda y luego se muestra la palma de la mano derecha."
+        img={q8}
+      />
+      {/* <Image source={qcomplete} style={st.note_img3} resizeMode="contain" /> */}
     </ScrollView>
+  );
+};
+
+const NoteText3 = ({ title = "", text = "", img }) => {
+  return (
+    <View style={{ marginVertical: 12 }}>
+      <Text style={st.note_text}>
+        {" "}
+        - <Text style={{ fontFamily: "Poppins-SemiBold" }}>{title}: </Text>
+        {text}
+      </Text>
+      <Image
+        style={{ height: 64, width: 64, marginTop: 6, alignSelf: "center" }}
+        source={img}
+      />
+    </View>
+  );
+};
+
+export const Note4 = () => {
+  return (
+    <ScrollView style={st.notes_screen} stickyHeaderIndices={[0]}>
+      <View style={st.top_line_ctn}>
+        <View style={st.top_line}></View>
+      </View>
+      <Text style={st.note_title}>Familia</Text>
+      <Text style={st.note_text}>
+        Existen señas compuestas de 2 movimientos como se observa en este nivel.
+        Algunos ejemplos son: Mamá, Papá, Hombre, entre otros.
+      </Text>
+      <Text style={st.note_text}>
+        Es importante también conocer que existen señas generales como: Hermano,
+        Abuelo o hijo. Que pueden ser utilizadas en conversaciones donde no sea
+        necesario especificar el género. Sin embargo si se desea especificar si
+        se habla de femenino o masculino se emplean 2 señas, por ejemplo:
+      </Text>
+      <Text style={[st.note_text, { marginTop: 12 }]}>
+        - Seña de "hijo" (general) + Seña de "mujer" = Hija
+      </Text>
+      <ImagesNote4 img1={fm.sonS} img2={fm.womanS} img3={fm.daugI} />
+      <Text style={[st.note_text, { marginTop: 12 }]}>
+        - Seña de "abuelo" (general) + Seña de "mujer" = Abuela
+      </Text>
+      <ImagesNote4 img1={fm.olderS} img2={fm.womanS} img3={fm.gmaI} />
+      <Text style={[st.note_text, { marginTop: 12 }]}>
+        - Seña de "Hermano" (general) + Seña de "Hombre" = Hermano (Varón)
+      </Text>
+      <ImagesNote4 img1={fm.hermS} img2={fm.manS} img3={fm.broI} />
+      <Text style={[st.note_text, { marginTop: 12,marginBottom:64 }]}>
+        Como resumen, si se desea identificar el género solo se debe utilizar la
+        seña general + la seña de hombre o mujer según sea el caso.
+      </Text>
+    </ScrollView>
+  );
+};
+
+const ImagesNote4 = ({ img1, img2, img3 }) => {
+  return (
+    <View
+      style={{ flexDirection: "row", alignItems: "center", marginVertical: 12 }}
+    >
+      <View style={st.note_img4}>{img1}</View>
+      <Image source={plus} style={{ width: 24, height: 24 }} />
+      <View style={st.note_img4}>{img2}</View>
+      <Image source={equal} style={{ width: 24, height: 24 }} />
+      <View style={[st.note_img4, { backgroundColor: "#FEC454" }]}>{img3}</View>
+    </View>
   );
 };

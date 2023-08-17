@@ -199,13 +199,43 @@ const LoseScreen = ({setModal}) => {
     </View>
   );
 };
+const LoseScreen2 = ({setModal}) => {
+  const [info, setInfo] = useState({
+    image: false,
+    text: "",
+  });
+  useEffect(() => {
+    setInfo(randomLose());
+    return () => {
+      setInfo({
+        image: false,
+        text: "",
+      });
+    };
+  }, []);
 
-const NextGameBtn = ({setModal}) => {
+  return (
+    <View style={st.modalCtn}>
+      <View style={st.top}>{info.image && <Image source={info.image} />}</View>
+      <View style={st.bottom}>
+        <Text style={st.bigText}>{info.text}</Text>
+        <NextGameBtn setModal={setModal} sChance={true} />
+      </View>
+    </View>
+  );
+};
+
+const NextGameBtn = ({setModal,sChance=false}) => {
   const nextGame = useNextGame();
   return (
     <Pressable onPress={()=>{
-      setModal(0)
-      nextGame()
+      if(sChance){
+        setModal(0)
+      }else{
+        setModal(0)
+        nextGame()
+      }
+
     }}>
       {({ pressed }) => (
         <View
@@ -229,6 +259,7 @@ export const ResultScreen = ({ status = 0,setModal }) => {
     <>
       {status === 1 && <WinScreen setModal={setModal} />}
       {status === 2 && <LoseScreen setModal={setModal} />}
+      {status === 5 && <LoseScreen2 setModal={setModal} />}
       {status === 3 && <CompleteScreen setModal={setModal} />}
       {status === 4 && <FailureScreen setModal={setModal} />}
     </>
@@ -240,16 +271,21 @@ const useNextGame = () => {
   const nav = useNavigation();
 
   const nextGame = async () => {
+    /** CHECK IF FINAL LVL */
     if (lvlData.pos + 1 === lvlData.levels.length) {
-      if (lvlData.stars > 1) {
+
+      /** CHECK STARS */
+      let aux = { ...userData };
+      const upgradeBool =  aux[`class${lvlData.loc}`][lvlData.index] < lvlData.stars;
+      
+      if (lvlData.stars > 1 && upgradeBool) {
         const { status, data } = await levelComplete(
           userData._id,
           lvlData.loc,
           lvlData.index,
           lvlData.stars
-        );
-        if (status === 200) {
-          let aux = { ...userData };
+          );
+          if (status === 200) {
           aux[`class${lvlData.loc}`][lvlData.index] = lvlData.stars;
           setUserData(aux);
         }
@@ -259,7 +295,6 @@ const useNextGame = () => {
         classIndex: lvlData.loc,
       });
     } else {
-      console.log(lvlData.pos);
       setLvlData({ ...lvlData, pos: lvlData.pos + 1 });
       nav.navigate(
         "Game" + JSON.stringify(lvlData.levels[lvlData.pos + 1].gameType)

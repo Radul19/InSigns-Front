@@ -49,12 +49,9 @@ const Login = ({ navigation }) => {
   };
 
   const goHome = async () => {
-
     setErrorDisplay(false);
     setLoad(true);
     const { data, status } = await login(inputs.username, inputs.password);
-    console.log(data)
-    console.log(status)
     setLoad(false);
     if (status === 200) {
       setInputs({
@@ -64,14 +61,19 @@ const Login = ({ navigation }) => {
       if (inputs.checkbox) {
         await storeLocalData("@user_id", data._id);
       }
-        setUserData(data);
-        navigation.navigate("Home");
-        
-        
-      } else if (status === 404) {
-        setErrorDisplay("Contraseña o datos incorrectos, intente nuevamente");
-      }else if(status === 401){
-      navigation.navigate("CodePage",{email:data.email,checkbox:inputs.checkbox});
+      setUserData(data);
+      navigation.navigate("Home");
+    } else if (status === 404) {
+      setErrorDisplay("Contraseña o datos incorrectos, intente nuevamente");
+    } else if (status === 401) {
+      setInputs({
+        username: "",
+        password: "",
+      });
+      navigation.navigate("CodePage", {
+        email: data.email,
+        checkbox: inputs.checkbox,
+      });
     }
   };
 
@@ -81,18 +83,18 @@ const Login = ({ navigation }) => {
       if (aux) {
         const { status, data } = await findUser(aux);
         if (status === 200) {
-          setUserData(data)
-          setLoad(false)
+          setUserData(data);
+          setLoad(false);
           navigation.navigate("Home");
         }
-      }else{
-        setLoad(false)
+      } else {
+        setLoad(false);
       }
     })();
   }, []);
 
   return (
-    <ScrollView style={{ backgroundColor: "#EEC1FB" }}>
+    <ScrollView style={{ backgroundColor: "#8A36D2" }}>
       {/* <ResultScreen status={3}  /> */}
       <LoadingScreen {...{ load }} />
       <Header />
@@ -193,7 +195,7 @@ const Header = () => {
               fontFamily: "Poppins-Medium",
               fontSize: 24,
               marginLeft: 12,
-              color: "#640D65",
+              color: "#fff",
             }}
           >
             EnSeñas
@@ -205,7 +207,7 @@ const Header = () => {
             fontFamily: "Poppins-Medium",
             fontSize: 24,
             marginTop: 8,
-            color: "#640D65",
+            color: "#fff",
           }}
         >
           Bienvenido!
@@ -215,8 +217,8 @@ const Header = () => {
             zIndex: 100,
             fontSize: 12,
             fontFamily: "Poppins-Medium",
-            color: "#640d65bf",
-            width: "60%",
+            color: "#fff",
+            width: "50%",
           }}
         >
           Prepárate con nuestras clases para divertirte mientras aprendes LSV
@@ -236,15 +238,15 @@ export default Login;
 
 const st = StyleSheet.create({
   topCtn: {
-    height: wh * 0.35,
+    height: wh * 0.4,
     width: "100%",
-    backgroundColor: "#EEC1FB",
+    backgroundColor: "#8A36D2",
     paddingTop: 38,
     paddingHorizontal: 24,
   },
   bottomCtn: {
     zIndex: 200,
-    minHeight: wh * 0.65 + 38,
+    minHeight: wh * 0.6 + 38,
     width: "100%",
     borderTopStartRadius: 30,
     borderTopRightRadius: 30,
@@ -280,7 +282,7 @@ const st = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 14,
-    backgroundColor: "#EEC1FB",
+    backgroundColor: "#FEC454",
     // marginTop: "auto",
     marginBottom: 14,
     opacity: pressed ? 0.5 : 1,

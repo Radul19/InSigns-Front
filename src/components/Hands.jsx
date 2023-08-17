@@ -60,6 +60,7 @@ import older from "../images/HandsComplex/older.png";
 import olderS from "../images/HandsComplex/olderS.png";
 import son from "../images/HandsComplex/son.png";
 import sonS from "../images/HandsComplex/sonS.png";
+import daug from "../images/HandsComplex/daug.png";
 import woman from "../images/HandsComplex/woman.png";
 import womanS from "../images/HandsComplex/womanS.png";
 import sis from "../images/HandsComplex/sis.png";
@@ -249,6 +250,9 @@ const SonI = () => {
 const SonS = () => {
   return <Image source={sonS} style={st.img} resizeMode="contain"  />;
 };
+const DaugI = () => {
+  return <Image source={daug} style={st.img} resizeMode="contain" />;
+};
 const WomanI = () => {
   return <Image source={woman} style={st.img} resizeMode="contain" />;
 };
@@ -337,6 +341,7 @@ export const fm = {
   sonS:<SonS/>,
   womanI:<WomanI/>,
   womanS:<WomanS/>,
+  daugI:<DaugI/>,
   sisI:<SisI/>,
   gmaI:<GmaI/>,
   gpaI:<GpaI/>,

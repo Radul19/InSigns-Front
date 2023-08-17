@@ -89,7 +89,7 @@ const Header = ({ navigation }) => {
       <Pressable
         style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1, padding: 4 })}
       >
-        <Dots width={24} height={24} />
+        {/* <Dots width={24} height={24} /> */}
       </Pressable>
     </View>
   );

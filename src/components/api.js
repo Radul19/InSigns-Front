@@ -1,6 +1,7 @@
 import axios from "axios"
-const url = "http://192.168.1.113:4000/"
-// const url = "https://in-signs-back-2puqk0khl-radul19.vercel.app/"
+// const url = "http://192.168.1.113:4000/"
+const url = "https://in-signs-back.vercel.app/"
+
 
 /// Funcion general para el catch error que se usa en TODAS las peticiones 
 const catchError = async (err) => {

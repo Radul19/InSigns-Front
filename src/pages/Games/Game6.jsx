@@ -1,41 +1,48 @@
-import { View, Text, StyleSheet, TextInput } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { ResultScreen } from "../../components/GameTopBar";
 import GameLayout from "./GameLayout";
 import Context from "../../components/Context";
 import { fm } from "../../components/Hands";
 import { ww } from "../../components/windowsSize";
+import plus from "../../images/plus.png";
 
-const Game6 = ({navigation}) => {
-  const { lvlData, setLvlData ,userData} = useContext(Context);
+const Game6 = ({ navigation }) => {
+  const [sChance, setSChance] = useState(true);
+  const { lvlData, setLvlData, userData } = useContext(Context);
   const { levels, stars, pos, loc } = lvlData;
 
   const [answer, setAnswer] = useState("");
   const [rmodal, setRmodal] = useState(false);
 
   const confirmResults = () => {
-    // console.log(userData)
     let travel = 0;
-    if ( answer.toUpperCase() === levels[pos].answer[0]) {
-      travel = 1
+    const noSpace = answer.replace(/\s/g, "");
+    if (noSpace.toUpperCase() === levels[pos].answer[0]) {
+      travel = 1;
     } else {
-      
-      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
-      travel = 2
+      if (sChance) {
+        setSChance(false);
+        travel = 5;
+      } else {
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
     }
 
     if (lvlData.pos + 1 === lvlData.levels.length) {
-      if(lvlData.stars <= 1){
-        travel = 4
-      }else{
-        travel = 3
+      if (lvlData.stars <= 1) {
+        travel = 4;
+      } else {
+        travel = 3;
       }
     }
-    setAnswer("")
+    setAnswer("");
     setRmodal(travel);
   };
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      setSChance(true);
       setRmodal(0);
       setAnswer("");
     });
@@ -57,12 +64,12 @@ const Game6 = ({navigation}) => {
 const FamilyGame2 = ({ answer, setAnswer, lvlData, loc }) => {
   return (
     <View style={st.gameScreen}>
-
       <View style={st.card_ctn_top}>
         <View style={st.card1}>{fm[lvlData.options[0]]}</View>
       </View>
       <View style={st.card_ctn_bottom}>
         <View style={st.card2}>{fm[lvlData.options[1]]}</View>
+        <Image style={{ height: 24, width: 24 }} source={plus}></Image>
         <View style={st.card2}>{fm[lvlData.options[2]]}</View>
       </View>
       <TextInput
@@ -89,28 +96,32 @@ const st = StyleSheet.create({
     alignItems: "center",
   },
   card_ctn_top: {
-      width: "100%",
-      alignItems: "center",
-      justifyContent: "center",
+    marginTop: -12,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
   },
   card_ctn_bottom: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
+    marginBottom: -24,
     // backgroundColor: "red",
   },
   card1: {
-    width: ww * 0.55 * 0.75,
-    height: ww * 0.55,
+    width: ww * 0.52 * 0.73,
+    height: ww * 0.52,
     borderRadius: 18,
     backgroundColor: "#FEC454",
     alignItems: "center",
     justifyContent: "center",
   },
   card2: {
-    width: ww * 0.55 * 0.75,
-    height: ww * 0.55,
+    paddingHorizontal: 6,
+    width: ww * 0.52 * 0.73,
+    height: ww * 0.52,
     borderRadius: 18,
     backgroundColor: "#AD72DF",
     alignItems: "center",

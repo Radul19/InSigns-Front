@@ -54,16 +54,13 @@ const ContentCtn = () => {
         title="¿Qué es el lenguaje de señas?"
         content="Es el lenguaje oficial de las personas sordas, sin embargo también puede ser utilizado por personas que posean algún tipo de discapacidad para poder comunicarse con palabras. Como sustituto del lenguaje oral, este también cumple las funciones necesarias para permitir la comunicación con libertad, logrando elaborar ideas y enriquecer el pensamiento de la persona que lo emplea."
       />
-      <DropdownItem
-        title="Estructura de LSV"
-        content="El lenguaje de señas es expresivo en su totalidad, y no sólo muestra propiedades organizativas complejas, también cuenta con una estructura gramatical independiente de la expresión oral. A continuación se muestra la estructura del LSV: Objeto + Sujeto + Verbo. 
-        También tiene un orden al momento de expresar las ideas:
-        1.Cronología (Tiempo)
-        2.Circunstancia (Situación o mensaje principal)
-        3.Causa-Efecto (Resultado)"
-      />
+      <DropdownItem2 />
     </View>
   );
+};
+
+const WtfText = () => {
+  return <Text>Objeto + Sujeto + Verbo</Text>;
 };
 
 const DropdownItem = ({ title, content }) => {
@@ -86,8 +83,53 @@ const DropdownItem = ({ title, content }) => {
         <Text style={{ fontFamily: "Poppins-Regular", color: "#595959" }}>
           {ellipsis === 3 ? "Leer más" : "Leer Menos"}
         </Text>
-        <View style={ellipsis === 99 && st.rotate} >
-        <ArrowDown color="#595959" />
+        <View style={ellipsis === 99 && st.rotate}>
+          <ArrowDown color="#595959" />
+        </View>
+      </Pressable>
+      <View style={st.line}></View>
+    </View>
+  );
+};
+
+const DropdownItem2 = ({}) => {
+  const [ellipsis, setEllipsis] = useState(3);
+  const toggleView = () => {
+    if (ellipsis === 3) {
+      setEllipsis(99);
+    } else {
+      setEllipsis(3);
+    }
+  };
+
+  return (
+    <View style={st.drop_item}>
+      <Text style={st.di_title}>Estructura del LSV</Text>
+      <Text style={st.di_content} numberOfLines={ellipsis}>
+        El lenguaje de señas es expresivo en su totalidad, y no sólo muestra
+        propiedades organizativas complejas, también cuenta con una estructura
+        gramatical independiente de la expresión oral. A continuación se muestra
+        la estructura del LSV:
+      </Text>
+      {ellipsis > 3 && (
+        <>
+          <Text style={st.textAlign}>
+            {"\n"}Objeto + Sujeto + Verbo{"\n\n"}
+          </Text>
+          <Text style={st.di_content} numberOfLines={ellipsis}>
+            También tiene un orden al momento de expresar las ideas:{"\n"}
+            1.Cronología (Tiempo){"\n"}
+            2.Circunstancia (Situación o mensaje principal) (Tiempo){"\n"}
+            3.Causa-Efecto (Resultado){"\n"}
+          </Text>
+        </>
+      )}
+      <Pressable style={st.readmore} onPress={toggleView}>
+        <Text style={{ fontFamily: "Poppins-Regular", color: "#595959" }}>
+          {ellipsis === 3 ? "Leer más" : "Leer Menos"}
+        </Text>
+        <View style={ellipsis === 99 && st.rotate}>
+          <ArrowDown color="#595959" />
         </View>
       </Pressable>
       <View style={st.line}></View>
@@ -152,7 +194,11 @@ const st = StyleSheet.create({
     backgroundColor: "#B3B3B3",
     marginBottom: 32,
   },
-  rotate:{
-    transform:[{rotate:'180deg'}]
-  }
+  rotate: {
+    transform: [{ rotate: "180deg" }],
+  },
+  textAlign: {
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+  },
 });

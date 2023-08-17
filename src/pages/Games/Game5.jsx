@@ -6,8 +6,9 @@ import Context from "../../components/Context";
 import { fm } from "../../components/Hands";
 import { ww } from "../../components/windowsSize";
 
-const Game5 = ({navigation}) => {
-  const { lvlData, setLvlData ,userData} = useContext(Context);
+const Game5 = ({ navigation }) => {
+  const [sChance, setSChance] = useState(true)
+  const { lvlData, setLvlData, userData } = useContext(Context);
   const { levels, stars, pos, loc } = lvlData;
 
   const [answer, setAnswer] = useState("");
@@ -16,26 +17,35 @@ const Game5 = ({navigation}) => {
   const confirmResults = () => {
     // console.log(userData)
     let travel = 0;
-    if ( answer.toUpperCase() === levels[pos].answer[0]) {
-      travel = 1
+    const noSpace = answer.replace(/\s/g,'');
+    let findResult = levels[pos].answer.find(
+      (ans) => ans === noSpace.toUpperCase()
+    );
+    if (findResult) {
+      travel = 1;
     } else {
-      
-      setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
-      travel = 2
+      if(sChance){
+        setSChance(false)
+        travel = 5
+      }else{
+        travel = 2;
+        setLvlData((prev) => ({ ...prev, stars: stars - 0.5 }));
+      }
     }
 
     if (lvlData.pos + 1 === lvlData.levels.length) {
-      if(lvlData.stars <= 1){
-        travel = 4
-      }else{
-        travel = 3
+      if (lvlData.stars <= 1) {
+        travel = 4;
+      } else {
+        travel = 3;
       }
     }
-    setAnswer("")
+    setAnswer("");
     setRmodal(travel);
   };
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      setSChance(true)
       setRmodal(0);
       setAnswer("");
     });
@@ -83,6 +93,7 @@ const st = StyleSheet.create({
     flex: 1,
     marginTop: 24,
     alignItems: "center",
+    justifyContent: "center",
   },
   card_ctn: {
     flexDirection: "row",
@@ -98,9 +109,11 @@ const st = StyleSheet.create({
     backgroundColor: "#FEC454",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal:6,
   },
   card2: {
-    width: ww * 0.55 * 0.75,
+    paddingHorizontal:6,
+    width: ww * 0.53 * 0.75,
     height: ww * 0.55,
     borderRadius: 18,
     backgroundColor: "#AD72DF",
